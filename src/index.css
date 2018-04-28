@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.map-area {
+  float: right;
+  display: inline-block;
+}
+
+.sidebar {
+  background-color: #449212;
+  width: 20vw;
+  height: 100vh;
+  float: left;
+  display: inline-block;
+}
+
+.sidebar h3 {
+  color: white;
+}

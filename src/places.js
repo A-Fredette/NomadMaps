@@ -66,14 +66,19 @@ deleteInterest = (target) => {
              onChange={(e) => this.updateInterest(e.target.value)}/>
            <input id='go-to-button' type='submit' value='Add'/>
         </form>
-        {this.state.interests.map((interest) => (
+        {this.props.interests.map((interest) => (
             <li key={interest.id}>
               <div className="interest">{interest.interest}</div>
               <div onClick={(e) => this.deleteInterest(interest)}>
                 <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-                <i class="fas fa-minus-circle"></i>
-              </button>
+                  <i class="fas fa-minus-circle"></i>
+                </button>
               </div>
+              <div>
+              <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                <i class="fas fa-plus-circle"></i>
+              </button>
+            </div>
             </li>
           ))
         }

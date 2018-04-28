@@ -14,16 +14,15 @@ class App extends Component {
     interests: [
       {
       id: '8292a3f9-598a-4f51-b964-424f466e31d0',
-      interest: 'Co-Working'
+      interest: 'Gyms'
       }
     ]
   }
 
   updateInterest = (search) => {
     console.log('Update Interest event called')
-   let newItem = {id: 17, focus: search}
-   console.log(newItem)
-   //this.setState({interests: newItem})
+    let newItem = {id: 17, focus: search}
+    console.log(newItem)
   }
 
   viewList = (event) => {

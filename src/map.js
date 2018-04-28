@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+/* global google */
 import React, { Component } from 'react'
 import axios from 'axios'
 
@@ -228,33 +229,29 @@ class Map extends Component {
 
   componentDidMount = () => {
     console.log("Component did mount fired")
-    this.drawGoogleMap()
-   }
+    //creates and draws the initial map and stores it in this.state.map
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng}
+    })
 
-   //creates and draws the initial map and stores it in this.state.map
-   drawGoogleMap() {
-     map = new google.maps.Map(document.getElementById('map'), {
-         zoom: 12,
-         center: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng}
-     })
+    const berghain = {lat: 52.5106, lng: 13.4422}
 
-     const berghain = {lat: 52.5106, lng: 13.4422}
-
-     this.setState({map: map})
-     const marker = new google.maps.Marker({
-       position: berghain,
-       map: this.state.map,
-       title: 'Good luck'
-     })
-     console.log(map)
+    this.setState({map: map})
+    const marker = new google.maps.Marker({
+      position: berghain,
+      map: this.state.map,
+      title: 'Good luck'
+    })
+    console.log(map)
    }
 
    createMarker = (location) => {
      console.log('get marker fired')
      console.log('location: ', location)
      const marker = new google.maps.Marker({
-       //map: this.state.map,
-       position: location
+       position: location,
+       animation: google.maps.Animation.DROP
      })
      marker.setMap(this.state.map)
    }
@@ -276,6 +273,10 @@ class Map extends Component {
       }
     }))
   }
+
+  //TODO: getPlaces has be be called fo each interest stored in app state (this.props.interest)
+  //TODO: avoid calling google map methods in the app.js is possible OR resolve TypeError issue
+
 
   //searches for a string query and returns a list of places
   getPlaces = () => {

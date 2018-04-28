@@ -17,13 +17,6 @@ class Places extends Component {
 
 //create Google autocomplete search box
 componentDidMount = () => {
-  let places = new google.maps.places.SearchBox(document.getElementById('autocomplete'))
-  let service = new google.maps.places.PlacesService()
-  var request = {
-    location: 'pyrmont',
-    radius: '500',
-    query: 'restaurant'
-  }
 }
 
 //utility function for creating a GUID

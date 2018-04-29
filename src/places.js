@@ -24,17 +24,9 @@ addInterest = (event) => {
   this.props.updateInterest(this.state.query)
 }
 
-//delete and interest when the minus sign is clicked on
-deleteInterest = (target) => {
-  console.log(target)
-  let id = target.id
-  let findIndex = this.state.interests.findIndex(thisBook => thisBook.id === id)
-  console.log(findIndex)
-  if (this.state.interests.length > -1) {
-    let interestEdit = this.state.interests.splice(findIndex, 1)
-    console.log(interestEdit)
-    this.setState({interest: interestEdit})
-  }
+//passes interest to be deleted to prop function for deletion
+delete = (interest) => {
+  this.props.deleteInterest(interest)
 }
 
   render() {
@@ -52,12 +44,12 @@ deleteInterest = (target) => {
         {this.props.interests.map((interest) => (
             <li className= 'interest-list' key={interest.id}>
               <div className="interest">{interest.interest}</div>
-              <div className= 'button-container' onClick={(e) => this.deleteInterest(interest)}>
+              <div className= 'button-container' onClick={(e) => this.delete(interest)}>
                 <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
                   <i class="fas fa-minus-circle"></i>
                 </button>
               </div>
-              <div className= 'button-container'>
+              <div className= 'button-container' onClick={(e) => this.props.getPlaces(interest)}>
               <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
                 <i class="fas fa-map-marker"></i>
               </button>

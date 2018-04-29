@@ -230,79 +230,17 @@ class Map extends Component {
   componentDidMount = () => {
     console.log("Component did mount fired")
     //creates and draws the initial map and stores it in this.state.map
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
-        center: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng}
-    })
 
-    const berghain = {lat: 52.5106, lng: 13.4422}
-
-    this.setState({map: map})
-    const marker = new google.maps.Marker({
-      position: berghain,
-      map: this.state.map,
-      title: 'Good luck'
+      map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 12,
+          center: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng}
     })
+    this.props.setMap(map)
     console.log(map)
    }
 
-   createMarker = (location) => {
-     console.log('get marker fired')
-     console.log('location: ', location)
-     const marker = new google.maps.Marker({
-       position: location,
-       animation: google.maps.Animation.DROP
-     })
-     marker.setMap(this.state.map)
-   }
-
-  //Finds the lat/lng coordinates of an address
-  findCenter = (event) => {
-    event.preventDefault()
-    let geocoder = new google.maps.Geocoder()
-    geocoder.geocode({address: this.state.address}, ((response, status) => {
-      if (status === 'OK') {
-        let lat = response[0].geometry.location.lat()
-        let lng = response[0].geometry.location.lng()
-        this.state.map.setCenter({lat:lat, lng:lng}) //centers the map at the new coordinates
-        this.setState({mapCenter: {lat:lat, lng:lng} }) //update the lat/lng state for access by other methos
-      } else {
-        console.log('Geocoder unsuccessful: ', status)
-        window.alert('Unable to find location, please try again')
-        return
-      }
-    }))
-  }
-
-  //TODO: getPlaces has be be called fo each interest stored in app state (this.props.interest)
-  //TODO: avoid calling google map methods in the app.js is possible OR resolve TypeError issue
-
-
-  //searches for a string query and returns a list of places
-  getPlaces = () => {
-    console.log('get places fired')
-    let service = new google.maps.places.PlacesService(this.state.map)
-    //must provide location to return results
-    service.textSearch(
-      {query: "food",
-      location: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng},
-      radius: '500'}, ((response, status) => {
-      console.log('status: ', status)
-      if (status === 'OK') {
-        console.log(response)
-        for (let place in response) {
-          this.createMarker({lat: response[place].geometry.location.lat(), lng: response[place].geometry.location.lng()})
-        }
-      } else {
-        console.log('Places text search failed ', status)
-      }
-      console.log(this.state.map)
-    }))
-  }
-
   updateAddress = (address) => {
-    this.setState({address: address})
-    console.log(this.state.address)
+    this.props.setAddress(address)
   }
 
   lightTheme = () => {
@@ -313,6 +251,11 @@ class Map extends Component {
   darkTheme = () => {
     this.setState({theme: darkTheme})
     this.state.map.setOptions({styles: this.state.theme})
+  }
+
+  goToLocation = (event) => {
+      event.preventDefault()
+      this.props.findCenter()
   }
 
   //Axios for handling HTTP requests Source: https://www.npmjs.com/package/axios
@@ -333,14 +276,14 @@ class Map extends Component {
    render() {
      return (
        <div className="map-area">
-          <form onSubmit={this.findCenter}>
+          <form onSubmit={this.goToLocation}>
             <div className="mdl-textfield mdl-js-textfield">
               <input
                 type="text"
                 placeholder="Where to?"
                 className="mdl-textfield__input location-search"
                 value={this.state.address}
-                onChange={(e) => this.updateAddress(e.target.value)}/>
+                onChange={(e) => this.setAddress(e.target.value)}/>
                 <label
                   className="mdl-textfield__label"
                   for="sample1">Text...
@@ -352,10 +295,6 @@ class Map extends Component {
                 value='Search'/>
            </div>
          </form>
-         <button
-           className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-           onClick={this.getPlaces}>
-           Get Places</button>
          <div>
            <h4>Theme Options</h4>
            <button

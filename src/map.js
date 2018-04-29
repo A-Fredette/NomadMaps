@@ -240,7 +240,7 @@ class Map extends Component {
    }
 
   updateAddress = (address) => {
-    this.props.setAddress(address)
+    this.setState({address: address})
   }
 
   lightTheme = () => {
@@ -255,7 +255,7 @@ class Map extends Component {
 
   goToLocation = (event) => {
       event.preventDefault()
-      this.props.findCenter()
+      this.props.findCenter(this.state.address)
   }
 
   //Axios for handling HTTP requests Source: https://www.npmjs.com/package/axios
@@ -283,7 +283,7 @@ class Map extends Component {
                 placeholder="Where to?"
                 className="mdl-textfield__input location-search"
                 value={this.state.address}
-                onChange={(e) => this.setAddress(e.target.value)}/>
+                onChange={(e) => this.updateAddress(e.target.value)}/>
                 <label
                   className="mdl-textfield__label"
                   for="sample1">Text...

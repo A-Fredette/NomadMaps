@@ -12,7 +12,6 @@ class App extends Component {
   state = {
     view: 'places',
     map: '',
-    address: '',
     mapCenter: {
       lat: 52.5106,
       lng: 13.4422
@@ -102,10 +101,9 @@ class App extends Component {
   }
 
   //Finds the lat/lng coordinates of an address or location string
-  findCenter = (event) => {
-    event.preventDefault()
+  findCenter = (address) => {
     let geocoder = new google.maps.Geocoder()
-    geocoder.geocode({address: this.state.address}, ((response, status) => {
+    geocoder.geocode({address: address}, ((response, status) => {
       if (status === 'OK') {
         let lat = response[0].geometry.location.lat()
         let lng = response[0].geometry.location.lng()
@@ -117,11 +115,6 @@ class App extends Component {
         return
       }
     }))
-  }
-
-  setAddress = (address) => {
-    this.setState({address: address})
-    console.log(this.state.address)
   }
 
   render() {

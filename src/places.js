@@ -6,30 +6,14 @@ const google = window.google
 class Places extends Component {
   state = {
     query: '',
-    //TODO: Interests should be managed in app state, pass through as a prop
-    interests: [
-      {
-      id: '8292a3f9-598a-4f51-b964-424f466e31d0',
-      interest: 'Co-Working'
-      }
-    ]
   }
 
-//create Google autocomplete search box
+//TODO: create Google autocomplete search box for interests
 componentDidMount = () => {
 }
 
-//utility function for creating a GUID
-GUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random()*16|0,
-          v = c === 'x' ? r : (r&0x3|0x8)
-      return v.toString(16)
-  })
-}
-
 //As the user types, update the query state
-updateInterest = (query) => {
+updateQuery = (query) => {
   this.setState({query: query})
   console.log(this.state.query)
 }
@@ -37,8 +21,7 @@ updateInterest = (query) => {
 //when the user clicks add, create a new interest from query state
 addInterest = (event) => {
   event.preventDefault()
-  this.setState({interests: this.state.interests.concat([{id: this.GUID(),interest: this.state.query}])})
-  console.log(this.state.interests)
+  this.props.updateInterest(this.state.query)
 }
 
 //delete and interest when the minus sign is clicked on
@@ -63,7 +46,7 @@ deleteInterest = (target) => {
              type='text'
              placeholder='Interest'
              value={this.state.query}
-             onChange={(e) => this.updateInterest(e.target.value)}/>
+             onChange={(e) => this.updateQuery(e.target.value)}/>
            <input id='go-to-button' type='submit' value='Add'/>
         </form>
         {this.props.interests.map((interest) => (
@@ -79,6 +62,7 @@ deleteInterest = (target) => {
                 <i class="fas fa-map-marker"></i>
               </button>
             </div>
+            <hr></hr>
             </li>
           ))
         }

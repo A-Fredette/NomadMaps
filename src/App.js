@@ -18,11 +18,20 @@ class App extends Component {
       }
     ]
   }
+  
+  //utility function for creating a GUID
+  GUID = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0,
+            v = c === 'x' ? r : (r&0x3|0x8)
+        return v.toString(16)
+    })
+  }
 
-  updateInterest = (search) => {
-    console.log('Update Interest event called')
-    let newItem = {id: 17, focus: search}
-    console.log(newItem)
+  updateInterest = (query) => {
+    this.setState({query: query})
+    this.setState({interests: this.state.interests.concat([{id: this.GUID(),interest: this.state.query}])})
+    console.log(this.state.interests)
   }
 
   viewList = (event) => {
@@ -55,7 +64,9 @@ class App extends Component {
         </div>
           <div>
             {this.state.view === 'places' ?
-            (<Places interests={this.state.interests}/>) :
+            (<Places
+              interests={this.state.interests}
+              updateInterest={this.updateInterest}/>) :
             (<ListView/>)
             }
           </div>

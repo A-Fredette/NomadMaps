@@ -4,6 +4,32 @@ body {
   font-family: sans-serif;
 }
 
+.button-container,
+.interest {
+  display: inline-block;
+  padding-right: 5px;
+  padding-top: 10px;
+}
+
+.interest {
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-weight: bold;
+  padding-left: 10px;
+}
+
+.button-container .mdl-button--fab {
+  font-size: 14px;
+}
+
+.mdl-button {
+  min-width: 0px;
+}
+
+.mdl-button--fab {
+  height: 25px;
+  width: 25px;
+}
+
 .map-area {
   float: right;
   display: inline-block;
@@ -19,4 +45,13 @@ body {
 
 .sidebar h3 {
   color: white;
+}
+
+.interest-list {
+  list-style: none;
+}
+
+.location-search {
+  clear:left;
+  padding-left: 100px;
 }

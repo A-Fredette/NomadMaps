@@ -67,16 +67,16 @@ deleteInterest = (target) => {
            <input id='go-to-button' type='submit' value='Add'/>
         </form>
         {this.props.interests.map((interest) => (
-            <li key={interest.id}>
+            <li className= 'interest-list' key={interest.id}>
               <div className="interest">{interest.interest}</div>
-              <div onClick={(e) => this.deleteInterest(interest)}>
+              <div className= 'button-container' onClick={(e) => this.deleteInterest(interest)}>
                 <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
                   <i class="fas fa-minus-circle"></i>
                 </button>
               </div>
-              <div>
+              <div className= 'button-container'>
               <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-                <i class="fas fa-plus-circle"></i>
+                <i class="fas fa-map-marker"></i>
               </button>
             </div>
             </li>

@@ -334,15 +334,15 @@ class Map extends Component {
      return (
        <div className="map-area">
           <form onSubmit={this.findCenter}>
-            <div class="mdl-textfield mdl-js-textfield">
+            <div className="mdl-textfield mdl-js-textfield">
               <input
                 type="text"
                 placeholder="Where to?"
-                class="mdl-textfield__input"
+                className="mdl-textfield__input location-search"
                 value={this.state.address}
                 onChange={(e) => this.updateAddress(e.target.value)}/>
                 <label
-                  class="mdl-textfield__label"
+                  className="mdl-textfield__label"
                   for="sample1">Text...
                 </label>
              <input

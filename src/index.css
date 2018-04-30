@@ -17,6 +17,10 @@ body {
   padding-left: 10px;
 }
 
+.theme-options {
+  display: inline-block;
+}
+
 .button-container .mdl-button--fab {
   font-size: 14px;
 }

@@ -19,7 +19,7 @@ class App extends Component {
     interests: [
       {
       id: '8292a3f9-598a-4f51-b964-424f466e31d0',
-      interest: 'Gyms'
+      interest: 'Co Working Spaces'
       }
     ]
   }
@@ -117,23 +117,35 @@ class App extends Component {
     }))
   }
 
+  removeMarkers = () => {
+
+  }
+
+  //TODO:List places returned from google in List View (should match markers)
+  //TODO:Clicking on a marker provides info for that location
+  //TODO:Enable filter of location list
+  //TODO:Only filtered markers should appear
+  //TODO:Attach another third party library to the location info for a given place
+  //TODO:Ability to customize color of Marker
+
+
   render() {
     return (
       <div>
         <div className='sidebar'>
           <div classnName='filter'>
             <input
-              id='list-button'
-              type='button'
-              value='List'
-              className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-              onClick={(e) => this.viewList(e)}/>
-            <input
               id='places-button'
               type='button'
               value='Interests'
               className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
               onClick={(e) => this.viewPlaces(e)}/>
+            <input
+              id='list-button'
+              type='button'
+              value='List'
+              className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+              onClick={(e) => this.viewList(e)}/>
         </div>
           <div>
             {this.state.view === 'places' ?
@@ -142,6 +154,7 @@ class App extends Component {
               getPlaces={this.getPlaces}
               updateInterest={this.updateInterest}
               deleteInterest={this.deleteInterest}
+              removeMarkers={this.removeMarkers}
             />)
             :
             (<ListView/>)

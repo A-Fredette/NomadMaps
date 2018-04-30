@@ -41,23 +41,30 @@ delete = (interest) => {
              onChange={(e) => this.updateQuery(e.target.value)}/>
            <input id='go-to-button' type='submit' value='Add'/>
         </form>
+        <hr></hr>
         {this.props.interests.map((interest) => (
             <li className= 'interest-list' key={interest.id}>
-              <div className="interest">{interest.interest}</div>
               <div className= 'button-container' onClick={(e) => this.delete(interest)}>
-                <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-                  <i class="fas fa-minus-circle"></i>
+                <button className="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                  <i className="fas fa-minus-circle"></i>
                 </button>
               </div>
+              <div className="interest">{interest.interest}</div>
               <div className= 'button-container' onClick={(e) => this.props.getPlaces(interest)}>
-              <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-                <i class="fas fa-map-marker"></i>
+              <button className="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                <i className="fas fa-map-marker"></i>
               </button>
             </div>
             <hr></hr>
             </li>
           ))
         }
+        <div>
+          <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+            onClick={this.props.removeMarkers}>
+          Remove Markers
+          </button>
+        </div>
       </div>
     )
   }

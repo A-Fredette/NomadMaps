@@ -230,7 +230,6 @@ class Map extends Component {
   componentDidMount = () => {
     console.log("Component did mount fired")
     //creates and draws the initial map and stores it in this.state.map
-
       map = new google.maps.Map(document.getElementById('map'), {
           zoom: 12,
           center: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng}
@@ -239,23 +238,25 @@ class Map extends Component {
     console.log(map)
    }
 
+  //updates state address with address or search result
   updateAddress = (address) => {
     this.setState({address: address})
   }
 
+  //centers map on address coordinates
+  goToLocation = (event) => {
+    event.preventDefault()
+    this.props.findCenter(this.state.address)
+  }
+
   lightTheme = () => {
     this.setState({theme: lightTheme})
-    this.state.map.setOptions({styles: this.state.theme})
+    this.props.map.setOptions({styles: this.state.theme})
   }
 
   darkTheme = () => {
     this.setState({theme: darkTheme})
-    this.state.map.setOptions({styles: this.state.theme})
-  }
-
-  goToLocation = (event) => {
-      event.preventDefault()
-      this.props.findCenter(this.state.address)
+    this.props.map.setOptions({styles: this.state.theme})
   }
 
   //Axios for handling HTTP requests Source: https://www.npmjs.com/package/axios
@@ -265,7 +266,7 @@ class Map extends Component {
   .then(response => {
     console.log(response)
     let coordinates = response.data.results[0].geometry.location
-    console.log("Successfull HTTP request: ", coordinates)
+    console.log('Successfull HTTP request: ', coordinates)
     this.updateCenter(coordinates)
   })
   .catch(error => {
@@ -275,18 +276,18 @@ class Map extends Component {
 
    render() {
      return (
-       <div className="map-area">
-          <form onSubmit={this.goToLocation}>
+       <div className='map-area'>
+          <form className='location-search' onSubmit={this.goToLocation}>
             <div className="mdl-textfield mdl-js-textfield">
               <input
-                type="text"
-                placeholder="Where to?"
-                className="mdl-textfield__input location-search"
+                type='text'
+                placeholder='Where to?'
+                className='mdl-textfield__input location-search'
                 value={this.state.address}
                 onChange={(e) => this.updateAddress(e.target.value)}/>
                 <label
-                  className="mdl-textfield__label"
-                  for="sample1">Text...
+                  className='mdl-textfield__label'
+                  for='sample1'>Text...
                 </label>
              <input
                 id='go-to-button'
@@ -295,8 +296,8 @@ class Map extends Component {
                 value='Search'/>
            </div>
          </form>
-         <div>
-           <h4>Theme Options</h4>
+         <div className='theme-options'>
+           <h5>Theme Options</h5>
            <button
              className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
              onClick={this.darkTheme}>

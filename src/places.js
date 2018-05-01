@@ -21,7 +21,12 @@ updateQuery = (query) => {
 //when the user clicks add, create a new interest from query state
 addInterest = (event) => {
   event.preventDefault()
-  this.props.updateInterest(this.state.query)
+  if (this.state.query === '') {
+    window.alert('Your interest cannot be blank')
+  } else {
+    this.props.updateInterest(this.state.query)
+  }
+
 }
 
 //passes interest to be deleted to prop function for deletion

@@ -21,7 +21,8 @@ class App extends Component {
       id: '8292a3f9-598a-4f51-b964-424f466e31d0',
       interest: 'Co Working Spaces'
       }
-    ]
+    ],
+    places: []
   }
 
   //utility function for creating a GUID
@@ -66,37 +67,51 @@ class App extends Component {
     this.setState({map: map})
   }
 
-  createMarker = (location) => {
+  createMarker = (response) => {
+    for (let place in response) {
+      const location = {lat: response[place].geometry.location.lat(), lng: response[place].geometry.location.lng()}
+      const marker = new google.maps.Marker({
+        position: location,
+        animation: google.maps.Animation.DROP
+      })
+      const name = response[place].name
+      const infowindow = new google.maps.InfoWindow({
+        content: name
+      })
+      marker.addListener('click', () => {
+        infowindow.open(this.state.map, marker)
+      })
+      marker.setMap(this.state.map)
+    }
     console.log('get marker fired')
-    console.log('location: ', location)
-    const marker = new google.maps.Marker({
-      position: location,
-      animation: google.maps.Animation.DROP
-    })
-    marker.setMap(this.state.map)
   }
 
+  //add places to state
+  addPlaces = (interest, response) => {
+    //TODO: fix function so duplicate interests cannot be entered
+      console.log('responses: ', response)
+      this.setState({places: this.state.places.concat({interest: interest.interest, locations: response})})
+      console.log('state places: ', this.state.places)
+  }
+
+  //gets places via google API
   getPlaces = (interest) => {
     console.log('get places fired')
     let targetInterest = interest.interest
-    console.log('interest: ', targetInterest)
     let service = new google.maps.places.PlacesService(this.state.map)
-    //must provide location to return results
-    service.textSearch(
+    service.textSearch( //must provide location to return results
       {query: targetInterest,
       location: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng},
       radius: '500'}, ((response, status) => {
       console.log('status: ', status)
       if (status === 'OK') {
-        console.log(response)
-        for (let place in response) {
-          this.createMarker({lat: response[place].geometry.location.lat(), lng: response[place].geometry.location.lng()})
-        }
+        console.log('Google places status: ', status)
+        this.addPlaces(interest, response)
+        this.createMarker(response)
       } else {
         console.log('Places text search failed ', status)
         window.alert('No results')
       }
-      console.log(this.state.map)
     }))
   }
 
@@ -117,11 +132,6 @@ class App extends Component {
     }))
   }
 
-  removeMarkers = () => {
-
-  }
-
-  //TODO:List places returned from google in List View (should match markers)
   //TODO:Clicking on a marker provides info for that location
   //TODO:Enable filter of location list
   //TODO:Only filtered markers should appear
@@ -157,7 +167,9 @@ class App extends Component {
               removeMarkers={this.removeMarkers}
             />)
             :
-            (<ListView/>)
+            (<ListView
+              places={this.state.places}
+            />)
             }
           </div>
       </div>

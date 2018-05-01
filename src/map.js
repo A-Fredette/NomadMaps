@@ -219,7 +219,6 @@ class Map extends Component {
   state = {
     map: {},
     address: '',
-    theme: '',
     bounds: '',
     mapCenter: {
       lat: 52.5106,
@@ -250,13 +249,11 @@ class Map extends Component {
   }
 
   lightTheme = () => {
-    this.setState({theme: lightTheme})
-    this.props.map.setOptions({styles: this.state.theme})
+    this.props.map.setOptions({styles: lightTheme})
   }
 
   darkTheme = () => {
-    this.setState({theme: darkTheme})
-    this.props.map.setOptions({styles: this.state.theme})
+    this.props.map.setOptions({styles: darkTheme})
   }
 
   //Axios for handling HTTP requests Source: https://www.npmjs.com/package/axios

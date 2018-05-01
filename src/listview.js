@@ -8,9 +8,16 @@ class ListView extends React.Component {
     filter: ''
   }
 
+  //updates filter state with entered text
   updateFilter = (query) => {
     this.setState({filter: query})
     console.log(this.state.filter)
+  }
+
+  //called when list item is clicked on
+  clickMarker = (e) => {
+    console.log(e.id) //place id that will also match marker id
+    //google.maps.event.trigger(marker[e.id], 'click')
   }
 
   render() {
@@ -26,13 +33,13 @@ class ListView extends React.Component {
         </div>
         <div>
           {this.props.places.map((place) => (
-              <li className= 'interest-list' key={place.interest}>
-                <hr></hr>
+              <div className='interest-list' key={place.interest}>
                 <div>{place.interest}</div>
+                <hr></hr>
                 {place.locations.map((place) =>(
-                  <div>{place.name}</div>
+                  <li key={place.id} id={place.id} onClick={(e) => this.clickMarker(e.target)}>{place.name}</li>
                 ))}
-              </li>
+              </div>
             ))
           }
         </div>

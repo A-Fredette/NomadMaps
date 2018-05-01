@@ -12,6 +12,7 @@ class App extends Component {
   state = {
     view: 'places',
     map: '',
+    markers:[],
     mapCenter: {
       lat: 52.5106,
       lng: 13.4422
@@ -70,9 +71,11 @@ class App extends Component {
   createMarker = (response) => {
     for (let place in response) {
       const location = {lat: response[place].geometry.location.lat(), lng: response[place].geometry.location.lng()}
+      const id = response[place].id
       const marker = new google.maps.Marker({
         position: location,
-        animation: google.maps.Animation.DROP
+        animation: google.maps.Animation.DROP,
+        id: id
       })
       const name = response[place].name
       const infowindow = new google.maps.InfoWindow({
@@ -82,8 +85,10 @@ class App extends Component {
         infowindow.open(this.state.map, marker)
       })
       marker.setMap(this.state.map)
+      this.setState({markers: this.state.markers.concat(marker)})
+      console.log('markers ', this.state.markers)
     }
-    console.log('get marker fired')
+    console.log(this.state.map)
   }
 
   //add places to state
@@ -132,12 +137,11 @@ class App extends Component {
     }))
   }
 
-  //TODO:Clicking on a marker provides info for that location
+  //TODO:Associate each marker with it's list view (clicking on list brings up marker infowindow)
   //TODO:Enable filter of location list
   //TODO:Only filtered markers should appear
   //TODO:Attach another third party library to the location info for a given place
   //TODO:Ability to customize color of Marker
-
 
   render() {
     return (
@@ -169,6 +173,8 @@ class App extends Component {
             :
             (<ListView
               places={this.state.places}
+              markers={this.state.markers}
+              map={this.state.map}
             />)
             }
           </div>

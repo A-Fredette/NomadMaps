@@ -16,8 +16,16 @@ class ListView extends React.Component {
 
   //called when list item is clicked on
   clickMarker = (e) => {
-    console.log(e.id) //place id that will also match marker id
-    //google.maps.event.trigger(marker[e.id], 'click')
+    let findIndex = this.props.markers.findIndex(thisMarker => thisMarker.id === e.id)
+    let marker = this.props.markers[findIndex]
+    marker.setAnimation(google.maps.Animation.BOUNCE)
+    setTimeout(() => {
+      marker.setAnimation(null)
+    }, 750)
+    let infowindow = marker.infowindow
+    infowindow.open(this.props.maps, marker)
+    console.log(infowindow)
+    console.log('matching marker :', this.props.markers[findIndex])
   }
 
   render() {

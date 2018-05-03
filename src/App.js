@@ -13,6 +13,7 @@ class App extends Component {
     view: 'places',
     map: '',
     markers:[],
+    infowindow: [],
     mapCenter: {
       lat: 52.5106,
       lng: 13.4422
@@ -46,7 +47,6 @@ class App extends Component {
     console.log(target)
     let id = target.id
     let findIndex = this.state.interests.findIndex(thisBook => thisBook.id === id)
-    console.log(findIndex)
     if (this.state.interests.length > -1) {
       let interestEdit = this.state.interests.splice(findIndex, 1)
       console.log(interestEdit)
@@ -72,23 +72,27 @@ class App extends Component {
     for (let place in response) {
       const location = {lat: response[place].geometry.location.lat(), lng: response[place].geometry.location.lng()}
       const id = response[place].id
-      const marker = new google.maps.Marker({
-        position: location,
-        animation: google.maps.Animation.DROP,
-        id: id
-      })
       const name = response[place].name
       const infowindow = new google.maps.InfoWindow({
         content: name
       })
+      const marker = new google.maps.Marker({
+        position: location,
+        animation: google.maps.Animation.DROP,
+        id: id,
+        infowindow: infowindow
+      })
+      this.setState({infowindow: this.state.infowindow.concat(infowindow)})
       marker.addListener('click', () => {
         infowindow.open(this.state.map, marker)
+        marker.setAnimation(google.maps.Animation.BOUNCE)
+        setTimeout(() => {
+          marker.setAnimation(null)
+        }, 750)
       })
       marker.setMap(this.state.map)
       this.setState({markers: this.state.markers.concat(marker)})
-      console.log('markers ', this.state.markers)
     }
-    console.log(this.state.map)
   }
 
   //add places to state
@@ -137,11 +141,18 @@ class App extends Component {
     }))
   }
 
-  //TODO:Associate each marker with it's list view (clicking on list brings up marker infowindow)
   //TODO:Enable filter of location list
   //TODO:Only filtered markers should appear
+  //TODO:Update API calls to async (Fetch API or XHR)
+  //TODO:Enable error handling for failed API calls
   //TODO:Attach another third party library to the location info for a given place
-  //TODO:Ability to customize color of Marker
+  //TODO:Enable service worker + offline first
+  //TODO:Deleting an interest removes its associated places from list
+  //TODO:Ability to customize color of Marker by interest
+  //TODO:Enable Focus (tabbing)
+  //TODO:Site elements are defined semantically (ARIA)
+  //TODO:Alternative text for all images
+  //TODO:Responsive design and styling over haul
 
   render() {
     return (
@@ -174,6 +185,7 @@ class App extends Component {
             (<ListView
               places={this.state.places}
               markers={this.state.markers}
+              infowindow={this.state.infowindow}
               map={this.state.map}
             />)
             }

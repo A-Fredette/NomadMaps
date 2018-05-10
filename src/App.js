@@ -6,22 +6,45 @@ import Places from './places.js'
 import ListView from './listview.js'
 import './App.css'
 
-const google = window.google
+const colors = {
+  green: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+  red: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+  blue: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+  purple: 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png',
+  yellow: 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+  state: 4
+}
 
 class App extends Component {
   state = {
     view: 'places',
     map: '',
     markers:[],
-    infowindow: [],
     mapCenter: {
-      lat: 52.5106,
-      lng: 13.4422
+      lat: 52.5200,
+      lng: 13.4050
     },
     interests: [
       {
       id: '8292a3f9-598a-4f51-b964-424f466e31d0',
-      interest: 'Co Working Spaces'
+      interest: 'Co Working Spaces',
+      color: colors.green,
+      css: {color: '#58f958'},
+      calls: 0
+      },
+      {
+      id: '092203d0-2d1f-4000-9838-7171c21dfa72',
+      interest: 'Coffee Shops',
+      color: colors.red,
+      css: {color: '#f06b6b'},
+      calls: 0
+      },
+      {
+      id: '4bda6a6f-8180-47c4-9396-2eb8a96c58de',
+      interest: 'Gyms',
+      color: colors.blue,
+      css: {color: '#778ee1'},
+      calls: 0
       }
     ],
     places: []
@@ -31,58 +54,123 @@ class App extends Component {
   GUID = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random()*16|0,
-            v = c === 'x' ? r : (r&0x3|0x8)
+          //eslint-disable-next-line
+          v = c === 'x' ? r : (r&0x3|0x8)
         return v.toString(16)
     })
   }
 
   //updates interests based on query entry (controlled in places.js)
   updateInterest = (query) => {
-    this.setState({interests: this.state.interests.concat([{id: this.GUID(),interest: query}])})
-    console.log(this.state.interests)
+    let newInterest = {
+      id: this.GUID(),
+      interest: query,
+      calls: 0
+    }
+    switch (colors.state) {
+      case 1:
+        newInterest.color = colors.green
+        newInterest.css = {color: '#58f958'}
+        colors.state = 2
+        break
+
+      case 2:
+        newInterest.color = colors.red
+        newInterest.css = {color: '#f06b6b'}
+        colors.state = 3
+        break
+
+      case 3:
+        newInterest.color = colors.blue
+        newInterest.css = {color: '#778ee1'}
+        colors.state = 4
+        break
+
+      case 4:
+        newInterest.color = colors.purple
+        newInterest.css = {color: '#c973e7'}
+        colors.state = 5
+        break
+
+      case 5:
+        newInterest.color = colors.yellow
+        newInterest.css = {color: '#e8ea66'}
+        colors.state = 1
+        break
+    }
+    this.setState({interests: this.state.interests.concat([newInterest])}) //set interest with associated color
   }
 
-  //delete and interest when the minus sign is clicked on
+  //removes places about deleted interests from this.state.places
+  removePlaces = (deletedInterest) => {
+    let filteredPlaces = this.state.places.filter(place => place.interest !== deletedInterest)
+    this.setState({places: filteredPlaces})
+  }
+
+  //delete interest state on event
   deleteInterest = (target) => {
-    console.log(target)
     let id = target.id
-    let findIndex = this.state.interests.findIndex(thisBook => thisBook.id === id)
+    let findIndex = this.state.interests.findIndex(thisInterest => thisInterest.id === id)
     if (this.state.interests.length > -1) {
       let interestEdit = this.state.interests.splice(findIndex, 1)
-      console.log(interestEdit)
       this.setState({interest: interestEdit})
     }
-  }
+    //removes markers of deleted interest
+    for (let marker in this.state.markers) {
+      if (this.state.markers[marker].interest.interest === target.interest) {
+        this.state.markers[marker].setMap(null)
+      }
+    }
+    this.removePlaces(target.interest)
+    }
 
+  //view list view in sidebar
   viewList = (event) => {
     event.preventDefault()
     this.setState({view: 'list'})
   }
 
+  //view places view in sidebar
   viewPlaces = (event) => {
     event.preventDefault()
     this.setState({view: 'places'})
   }
 
+  //map is created and called in map.js, but stored in app.js state
   setMap = (map) => {
     this.setState({map: map})
   }
 
-  createMarker = (response) => {
+  //method for getting location information from Foursquare's API
+  getInfo = (lat, lng, name) => {
+    fetch(`https://api.foursquare.com/v2/venues/search?ll=${lat},${lng}&intent=match&name=${name}&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+    {
+    method: "GET",
+    })
+    .then(response => response.json())
+    .then(response => console.log(response.venues[1].id))
+  }
+
+  //creates a marker and associated infowindow
+  createMarker = (interest, response) => {
     for (let place in response) {
-      const location = {lat: response[place].geometry.location.lat(), lng: response[place].geometry.location.lng()}
-      const id = response[place].id
+      const lat = response[place].geometry.location.lat()
+      const lng = response[place].geometry.location.lng()
+      const id = response[place].id //GUID
       const name = response[place].name
-      const infowindow = new google.maps.InfoWindow({
-        content: name
+      //const imageURL = this.getImage(lat, lng)
+      const infowindow = new google.maps.InfoWindow({  //storing infowindow in marker for easy access
+        content: name //TODO: write HTML for infowindow display "<div style='float:left'>
       })
-      const marker = new google.maps.Marker({
-        position: location,
+      //this.getInfo(lat, lng, name)   //fetch place info from foursquare
+      const marker = new google.maps.Marker({   //creating the marker
+        position: {lat: lat, lng: lng},
         animation: google.maps.Animation.DROP,
         id: id,
-        infowindow: infowindow
+        infowindow: infowindow,
+        interest: interest
       })
-      this.setState({infowindow: this.state.infowindow.concat(infowindow)})
+      //adding event listener for click
       marker.addListener('click', () => {
         infowindow.open(this.state.map, marker)
         marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -90,38 +178,40 @@ class App extends Component {
           marker.setAnimation(null)
         }, 750)
       })
-      marker.setMap(this.state.map)
+      marker.setIcon(interest.color)
+      marker.setMap(this.state.map) //places marker on map
       this.setState({markers: this.state.markers.concat(marker)})
     }
   }
 
   //add places to state
   addPlaces = (interest, response) => {
-    //TODO: fix function so duplicate interests cannot be entered
-      console.log('responses: ', response)
-      this.setState({places: this.state.places.concat({interest: interest.interest, locations: response})})
-      console.log('state places: ', this.state.places)
+    this.setState({places: this.state.places.concat({interest: interest.interest, locations: response})})
   }
 
-  //gets places via google API
+  //gets places via google API from interest and locations that are stored in state
+  //TODO: Update to fetch request
   getPlaces = (interest) => {
-    console.log('get places fired')
-    let targetInterest = interest.interest
-    let service = new google.maps.places.PlacesService(this.state.map)
-    service.textSearch( //must provide location to return results
-      {query: targetInterest,
-      location: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng},
-      radius: '500'}, ((response, status) => {
-      console.log('status: ', status)
-      if (status === 'OK') {
-        console.log('Google places status: ', status)
-        this.addPlaces(interest, response)
-        this.createMarker(response)
-      } else {
-        console.log('Places text search failed ', status)
-        window.alert('No results')
-      }
-    }))
+    if (interest.calls === 0) {
+      console.log('get places fired')
+      let targetInterest = interest.interest
+      let service = new google.maps.places.PlacesService(this.state.map)
+      service.textSearch( //must provide location to return results
+        {query: targetInterest,
+        location: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng},
+        radius: '300'}, ((response, status) => {
+        console.log('status: ', status)
+        if (status === 'OK') {
+          this.addPlaces(interest, response)
+          this.createMarker(interest, response)
+        } else {
+          console.log('Places text search failed ', status)
+          window.alert('No results')
+        }
+      }))
+      interest.calls = 1
+    }
+
   }
 
   //Finds the lat/lng coordinates of an address or location string
@@ -141,24 +231,87 @@ class App extends Component {
     }))
   }
 
-  //TODO:Enable filter of location list
-  //TODO:Only filtered markers should appear
-  //TODO:Update API calls to async (Fetch API or XHR)
-  //TODO:Enable error handling for failed API calls
-  //TODO:Attach another third party library to the location info for a given place
+  //removes all markers from the map
+  //TODO: also remove all places and reset interest.calls so they can be used again
+  removeMarkers = () => {
+    for (let marker in this.state.markers) {
+      this.state.markers[marker].setMap(null)
+    }
+  }
+
+  //method for handling fetch errors
+  handleErrors = (response) => {
+    if (!response.ok) {
+      throw Error(response.statusText)
+    }
+    return response
+  }
+
+  //sets markers for interests that are set in the initial interests state
+  componentDidMount = () => {
+    setTimeout(() => {
+      for (const each in this.state.interests) {
+        this.getPlaces(this.state.interests[each])
+      }
+    }, 2000)
+
+    const lat = 52.510626
+    const lng = 13.442224
+    const name = 'Berghain'
+    let fetchId = null
+
+    fetch(`https://api.foursquare.com/v2/venues/search?ll=${lat},${lng}&intent=match&name=${name}&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+    {
+    method: 'GET'
+    })
+    .then(response => this.handleErrors(response))
+    .then(response => response.json())
+    .then(data => {
+      fetchId = data.response.venues[0].id
+      console.log(fetchId) //venue ID
+      //fetch call for venue photos
+      return fetch(`https://api.foursquare.com/v2/venues/${fetchId}/photos?&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+      {
+      method: 'GET'
+      })
+    })
+    .then(response => this.handleErrors(response))
+    .then(response => response.json())
+    .then(data => {
+      let returnedFotos = data.response.photos.items
+      console.log(returnedFotos)
+        return returnedFotos
+      })
+    .then(photos => {
+      for (let eachFoto in photos) {
+        console.log(photos[eachFoto].prefix+'width100'+photos[eachFoto].suffix) //returns URL of photo to be used in InfoWindow
+      }})
+    //add check for empty photos array
+  }
+
+  getHours = (venueId) => {
+    fetch(`https://api.foursquare.com/v2/venues/${venueId}/hours?&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`, {
+      method: 'GET'
+    })
+    .then(response => this.handleErrors(response))
+    .then(response => response.json())
+  }
+
+  //TODO:Fetch/XHR for Google Places Calls
+  //TODO:Link back to Foursquare (attribution) https://developer.foursquare.com/docs/terms-of-use/attribution
+
   //TODO:Enable service worker + offline first
-  //TODO:Deleting an interest removes its associated places from list
-  //TODO:Ability to customize color of Marker by interest
+
   //TODO:Enable Focus (tabbing)
   //TODO:Site elements are defined semantically (ARIA)
   //TODO:Alternative text for all images
-  //TODO:Responsive design and styling over haul
+  //TODO:Responsive design and styling overhaul
 
   render() {
     return (
       <div>
         <div className='sidebar'>
-          <div classnName='filter'>
+          <div className='filter'>
             <input
               id='places-button'
               type='button'
@@ -185,8 +338,8 @@ class App extends Component {
             (<ListView
               places={this.state.places}
               markers={this.state.markers}
-              infowindow={this.state.infowindow}
               map={this.state.map}
+              interests={this.state.interests}
             />)
             }
           </div>

@@ -32,6 +32,10 @@ body {
   font-size: 14px;
 }
 
+.marker-icon {
+  background-color: #000 !important;
+}
+
 .mdl-button {
   min-width: 0px;
 }
@@ -44,6 +48,7 @@ body {
 .map-area {
   float: right;
   display: inline-block;
+  width: 80%;
 }
 
 .sidebar {

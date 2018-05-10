@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 /* global google */
 import React, { Component } from 'react'
-import axios from 'axios'
 
 const mapStyle = {
   width: '80vw',
@@ -9,7 +8,6 @@ const mapStyle = {
 }
 
 let map
-const google = window.google
 const darkTheme =  [
   {"featureType": "all","elementType": "all","stylers": [{"invert_lightness": true},{"saturation": "-9"},{"lightness": "0"},{"visibility": "simplified"}]},{"featureType": "landscape.man_made","elementType": "all","stylers": [{"weight": "1.00"}]},{"featureType": "road.highway","elementType": "all","stylers": [{"weight": "0.49"}]},
   {"featureType": "road.highway","elementType": "labels","stylers": [{"visibility": "on"},{"weight": "0.01"},{"lightness": "-7"},{"saturation": "-35"}]},{"featureType": "road.highway","elementType": "labels.text","stylers": [{"visibility": "on"}]},
@@ -219,22 +217,16 @@ class Map extends Component {
   state = {
     map: {},
     address: '',
-    bounds: '',
-    mapCenter: {
-      lat: 52.5106,
-      lng: 13.4422
-    }
+    bounds: ''
   }
 
+  //creates and draws the initial map and stores it in this.props.map (app.js)
   componentDidMount = () => {
-    console.log("Component did mount fired")
-    //creates and draws the initial map and stores it in this.state.map
-      map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 12,
-          center: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng}
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 13,
+        center: {lat: 52.5200, lng: 13.4050}
     })
     this.props.setMap(map)
-    console.log(map)
    }
 
   //updates state address with address or search result
@@ -256,21 +248,6 @@ class Map extends Component {
     this.props.map.setOptions({styles: darkTheme})
   }
 
-  //Axios for handling HTTP requests Source: https://www.npmjs.com/package/axios
-  axiosRequest = (event) => {
-    event.preventDefault() //stop the form from reloading the page --> this causes componentDidMount to fire again
-    axios.get('https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyCnk13B0GvH152PBNcvAyJRURzQyCgDInk')
-  .then(response => {
-    console.log(response)
-    let coordinates = response.data.results[0].geometry.location
-    console.log('Successfull HTTP request: ', coordinates)
-    this.updateCenter(coordinates)
-  })
-  .catch(error => {
-    console.log(error)
-    })
-  }
-
    render() {
      return (
        <div className='map-area'>
@@ -278,13 +255,13 @@ class Map extends Component {
             <div className="mdl-textfield mdl-js-textfield">
               <input
                 type='text'
-                placeholder='Where to?'
+                placeholder='Where to, Nomad?'
                 className='mdl-textfield__input location-search'
                 value={this.state.address}
                 onChange={(e) => this.updateAddress(e.target.value)}/>
                 <label
                   className='mdl-textfield__label'
-                  for='sample1'>Text...
+                  >Text...
                 </label>
              <input
                 id='go-to-button'

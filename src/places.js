@@ -1,8 +1,6 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react'
 
-const google = window.google
-
 class Places extends Component {
   state = {
     query: '',
@@ -14,8 +12,9 @@ componentDidMount = () => {
 
 //As the user types, update the query state
 updateQuery = (query) => {
-  this.setState({query: query})
-  console.log(this.state.query)
+  this.setState({query: query}, () => {
+    console.log(this.state.query)
+  })
 }
 
 //when the user clicks add, create a new interest from query state
@@ -26,14 +25,13 @@ addInterest = (event) => {
   } else {
     this.props.updateInterest(this.state.query)
   }
-
 }
 
 //passes interest to be deleted to prop function for deletion
 delete = (interest) => {
   this.props.deleteInterest(interest)
 }
-
+  //TODO: (not for graduation) allow users to customize the color of the markers
   render() {
     return (
       <div>
@@ -56,7 +54,8 @@ delete = (interest) => {
               </div>
               <div className="interest">{interest.interest}</div>
               <div className= 'button-container' onClick={(e) => this.props.getPlaces(interest)}>
-              <button className="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+              <button className="marker-icon mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
+                  style={interest.css}>
                 <i className="fas fa-map-marker"></i>
               </button>
             </div>

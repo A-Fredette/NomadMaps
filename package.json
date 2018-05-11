@@ -1,7 +1,14 @@
 {
   "name": "nomad-map",
   "version": "0.1.0",
+  "homepage": "https://a-fredette.github.io/NomadMaps/",
   "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
     "axios": "^0.18.0",
     "prop-types": "^15.6.1",
@@ -11,10 +18,7 @@
     "react-scripts": "1.1.1",
     "whatwg-fetch": "^2.0.4"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+  "devDependencies": {
+    "gh-pages": "^1.1.0"
   }
 }

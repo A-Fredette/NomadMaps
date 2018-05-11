@@ -210,7 +210,6 @@ getPhotos = (foursquareId) => {
   }
 }
 
-
   //creates a marker and associated infowindow
   createMarker = (interest, response) => {
     for (let place in response) {
@@ -282,7 +281,16 @@ getPhotos = (foursquareId) => {
       }))
       interest.calls = 1
     }
+  }
 
+  //reset the calls of all interests
+  resetMarkerCalls = () => {
+    let updatedInterests = this.state.interests
+    for (let interest in updatedInterests) {
+      updatedInterests[interest].calls = 0
+    }
+    this.setState({interests: updatedInterests})
+    console.log(updatedInterests)
   }
 
   //Finds the lat/lng coordinates of an address or location string
@@ -292,8 +300,13 @@ getPhotos = (foursquareId) => {
       if (status === 'OK') {
         let lat = response[0].geometry.location.lat()
         let lng = response[0].geometry.location.lng()
+        this.setState({places: []})
         this.state.map.setCenter({lat:lat, lng:lng}) //centers the map at the new coordinates
         this.setState({mapCenter: {lat:lat, lng:lng} }) //update the lat/lng state for access by other methos
+        this.resetMarkerCalls()
+        for (const each in this.state.interests) { //get places/markers for new location
+          this.getPlaces(this.state.interests[each])
+        }
       } else {
         console.log('Geocoder unsuccessful: ', status)
         window.alert('Unable to find location, please try again')
@@ -326,12 +339,6 @@ getPhotos = (foursquareId) => {
         this.getPlaces(this.state.interests[each])
       }
     }, 2000)
-
-    const lat = 52.510626
-    const lng = 13.442224
-    const name = 'Berghain'
-
-    this.getHours('57d2e7d1498eba92c602ce4e')
   }
 
   getHours = (venueId) => {
@@ -408,44 +415,8 @@ getPhotos = (foursquareId) => {
     return infowindow
   }
 
-  /*createMarker = (interest, response) => {
-    const lat = response[place].geometry.location.lat()
-    const lng = response[place].geometry.location.lng()
-    const id = response[place].id //GUID
-    const name = response[place].name
-    const hours = '9-5'
-
-    const marker = new google.maps.Marker({   //creating the marker
-      position: {lat: lat, lng: lng},
-      animation: google.maps.Animation.DROP,
-      id: id,
-      infowindow: infowindow, //storing infowindow in marker for easy access
-      interest: interest
-    })
-    //adding event listener for click
-    marker.addListener('click', () => {
-      infowindow.open(this.state.map, marker)
-      marker.setAnimation(google.maps.Animation.BOUNCE)
-      setTimeout(() => {
-        marker.setAnimation(null)
-      }, 750)
-    })
-    marker.setIcon(interest.color)
-    marker.setMap(this.state.map) //places marker on map
-    this.setState({markers: this.state.markers.concat(marker)})
-  } */
-
-  /*
-
-places API --> returns a response -->
-fetch API --> uses response to get id, pictures and hours --->
-calls create info window --->
-calls create marker
-
-   */
-
-
-  //TODO:Fetch/XHR for Google Places Calls
+  //TODO: Reduce radius of places search
+  //TODO:Set up infowido with foursquare InfoWindow
   //TODO:Link back to Foursquare (attribution) https://developer.foursquare.com/docs/terms-of-use/attribution
 
   //TODO:Enable service worker + offline first

@@ -32,7 +32,7 @@ class App extends Component {
       color: colors.green,
       css: {color: '#58f958'},
       calls: 0
-      }/*,
+      },
       {
       id: '092203d0-2d1f-4000-9838-7171c21dfa72',
       interest: 'Coffee Shops',
@@ -46,7 +46,7 @@ class App extends Component {
       color: colors.blue,
       css: {color: '#778ee1'},
       calls: 0
-    }*/
+    }
     ],
     places: []
   }
@@ -138,7 +138,7 @@ class App extends Component {
       }
     }
     this.removePlaces(target.interest)
-    }
+  }
 
   //view list view in sidebar
   viewList = (event) => {
@@ -214,17 +214,17 @@ class App extends Component {
   //gets places via google API from interest and locations that are stored in state
   getPlaces = (interest) => {
     if (interest.calls === 0) {
-      console.log('get places fired')
       let targetInterest = interest.interest
       let service = new google.maps.places.PlacesService(this.state.map)
       service.textSearch( //must provide location to return results
         {query: targetInterest,
         location: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng},
         radius: '300'}, ((response, status) => {
-        console.log('status: ', status)
         if (status === 'OK') {
           this.addPlaces(interest, response) //add places to state
-          this.foursquareInfo(response, interest) //get place info, create Google InfoWindow and Markers
+          for (let place in response){
+            this.foursquareInfo(response[place], interest) //get place info, create Google InfoWindow and Markers
+          }
         } else {
           console.log('Places text search failed ', status)
           window.alert('No results')
@@ -234,60 +234,88 @@ class App extends Component {
     }
   }
 
-  //method for getting location information from Foursquare's API
-  foursquareInfo = (response, interest) => {
-    let info = {}
+  getId = (lat, lng, name, info) => {
+    return new Promise((resolve, reject) => {
+      fetch(`https://api.foursquare.com/v2/venues/search?ll=${lat},${lng}&intent=match&name=${name}&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+      { method: 'GET'})
+      .then(response => this.handleErrors(response, name))
+      .then(response => {
+        return response.json()
+      }).then(data => {
+        if (data.response.venues.length >= 1) {
+          info.foursquareId = data.response.venues[0].id
+          resolve(info)
+        } else {
+          reject(info)
+        }
+      }).catch(error => console.log(error))
+    })
+  }
 
-    for (const place in response) {
-      const lat = response[place].geometry.location.lat()
-      const lng = response[place].geometry.location.lng()
-      const id = response[place].id //GUID
-      const name = response[place].name.replace(/[^a-zA-Z ]/g, "") //remove special charecters (source: https://stackoverflow.com/questions/6555182/remove-all-special-characters-except-space-from-a-string-using-javascript)
-
-    fetch(`https://api.foursquare.com/v2/venues/search?ll=${lat},${lng}&intent=match&name=${name}&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
-    { method: 'GET'})
-    .then(response => this.handleErrors(response, name))
-    .then(response => response.json())
-    .then(data => {
-      if (data.response.venues.length >= 1) {
-        console.log('venues success ', data.response.venues[0].id)
-        info.foursquareId = data.response.venues[0].id
-        return info
+  getPhotos = (info) => {
+    return new Promise((resolve, reject) => {
+      if (info.foursquareId === 'no match') {
+        info.photoURL = 'Kein Foto'
+        reject(info)
       } else {
-        console.log('venues failure ', data.response.venues)
-        info.foursquareId = 'no match'
-        return info
-      }
-    }).then(info => {
-        //console.log('info after get id: ', info)
-        return info
-    }).then(info => {
-        this.getPhotos(info) //get photos form Foursquare
-        return info
-    }).then(info => {
-        //console.log('after photo ', info)
-        return info})
-    .then(info => {
-      this.getHours(info)
-      return info
-    }).then(info => this.createWindow(name, info)) //create info window
-    .then(infowindow => this.createMarker(lat, lng, name, id, interest, infowindow)) //create and place a marker
-    .catch(error => requestError(error))
-
+        fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/photos?&limit=1&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+        { method: 'GET' })
+      .then(response => {
+        return response.json()
+      }).then(data => { //keeping this step in case use is expanded to multiple images
+        let photosArray = data.response.photos.items
+        return photosArray
+      }).then(photos => {
+        info.photoURL = (photos[0]) ? photos[0].prefix+'width150'+photos[0].suffix : 'Kein Foto'
+        resolve(info)
+    }).catch(error => console.log(error))
     }
-  function addId(data) {
-    console.log(data)
-    return data
-  }
-
-  function requestError(error) {
-    console.log(error)
-  }
+  })
 }
+
+//creates an info window by calling google API.
+//populates window with data from Foursquare API.
+getHours = (info) => {
+  return new Promise((resolve, reject) => {
+    if (info.foursquareId === 'no match') {
+      info.hours = 'Hours Not Available'
+      reject(info)
+    } else {
+      fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/hours?&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+        { method: 'GET' })
+      .then(response => response.json())
+      .then(data => {
+        info.hours = (data.response.hours.timeframes) ? data.response.hours.timeframes[0].open[0] : 'Hours Not Available'
+        resolve(info)})
+      .catch(error => console.log(error))
+    }
+  })
+}
+
+//method for getting location information from Foursquare's API
+foursquareInfo = (response, interest) => {
+  let info = {}
+
+  /*for (const place in response) {*/
+    const lat = response.geometry.location.lat()
+    const lng = response.geometry.location.lng()
+    const id = response.id //GUID
+    const name = response.name.replace(/[^a-zA-Z ]/g, "") //remove special charecters (source: https://stackoverflow.com/questions/6555182/remove-all-special-characters-except-space-from-a-string-using-javascript)
+
+    this.getId(lat, lng, name, info) //get venue Foursquare ID (async)
+    .then(idResult => {
+      return this.getPhotos(idResult)}) //get venue Photos from Foursquare (async)
+    .then(photoResult => {
+      return this.getHours(photoResult)}) //get venue hours from Foursquare (async)
+    .then(response => {
+      return this.createWindow(name, response)})
+    .then(infowindow => {
+      this.createMarker(lat, lng, name, id, interest, infowindow)})
+    .catch(error => console.log(error))
+  }
 
 //creates a marker and associated infowindow
 createMarker = (lat, lng, name, id, interest, infowindow) => {
-
     const marker = new google.maps.Marker({   //creating the marker
       position: {lat: lat, lng: lng},
       animation: google.maps.Animation.DROP,
@@ -310,25 +338,8 @@ createMarker = (lat, lng, name, id, interest, infowindow) => {
 
 //create a google infowindow, populated by info from Foursquare API
 createWindow = (name, info) => {
-  let photoHTML = ''
-  let hoursHTML = ''
-
-  if (info.photoURL !== 'kein foto') {
-    photoHTML = `<img src=${info.photoURL} alt=${name+' image'}></img>`
-    //console.log('photo!')
-  } else {
-    //console.log('no photo')
-    photoHTML = '<h4>No Photos Available</h4>'
-  }
-
-  if (info.hours !== 'Hours Not Available') {
-    //console.log(info)
-    hoursHTML = `<p className='hours-text'>${info.hours.start} to ${info.hours.end}</p>`
-    //console.log('hours available!')
-  } else {
-    hoursHTML = `<p className='hours-text'>Hours Not Available</p>`
-  }
-
+  let photoHTML = (info.photoURL !== 'kein foto') ? `<img src=${info.photoURL} alt=${name+' image'}></img>` : '<h4>No Photos Available</h4>'
+  let hoursHTML = (info.hours !== 'Hours Not Available') ? `<p className='hours-text'>${info.hours.start} to ${info.hours.end}</p>` : `<p className='hours-text'>Hours Not Available</p>`
   const infowindow = new google.maps.InfoWindow({
     content: `<div className='infowindow-div'>
         <h4 className='name'>${name}</h4>
@@ -340,63 +351,7 @@ createWindow = (name, info) => {
         </div>
       </div>`
     })
-    return infowindow
-}
-
-//creates an info window by calling google API.
-//populates window with data from Foursquare API.
-getHours = (info) => {
-  if (info.foursquareId === 'no match') {
-    info.hours = 'Hours Not Available'
-    return info
-  } else {
-    fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/hours?&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
-      { method: 'GET' })
-      //.then(response => this.handleErrors(response))
-      .then(response => response.json())
-      .then(data => {
-        if (data.response.hours.timeframes) {
-          info.hours = data.response.hours.timeframes[0].open[0]
-          //console.log('HOURS AVAILABLE!', info.hours)
-          return info
-        } else {
-          info.hours = 'Hours Not Available'
-          return info
-        }
-      }).then(info => {
-        //console.log('exiting info', info)
-        return info
-      })
-    }
-  }
-
-getPhotos = (info) => {
-  if (info.foursquareId === 'no match') {
-    info.photoURL = 'kein foto'
-    return info
-  } else {
-    fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/photos?&limit=1&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
-    { method: 'GET' })
-  .then(response => this.handleErrors(response))
-  .then(response => response.json())
-  .then(data => { //keeping this step in case use is expanded to multiple images
-    let photosArray = data.response.photos.items
-      return photosArray
-    })
-  .then(photos => {
-    if (photos[0]) {
-      info.photoURL = photos[0].prefix+'width150'+photos[0].suffix
-      return info
-    } else {
-      info.photoURL = 'Kein Foto'
-      return info
-    }})
-  .catch(error => photoError(error))
-  }
-
-  function photoError(error) {
-    console.log(error)
-  }
+  return infowindow
 }
 
   //TODO:Reduce radius of places search

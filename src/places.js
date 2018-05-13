@@ -36,38 +36,42 @@ delete = (interest) => {
     return (
       <div>
         <form onSubmit={this.addInterest}>
+          <input id='add-interest-button' className='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' type='submit' value='Add'/>
           <input
              id='autocomplete'
              type='text'
-             placeholder='Interest'
+             placeholder='Add an Interest'
              value={this.state.query}
              onChange={(e) => this.updateQuery(e.target.value)}/>
-           <input id='go-to-button' type='submit' value='Add'/>
         </form>
         <hr></hr>
         {this.props.interests.map((interest) => (
+          <div className='interest-container' key={interest.id}>
             <li className= 'interest-list' key={interest.id}>
               <div className= 'button-container' onClick={(e) => this.delete(interest)}>
                 <button className="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
                   <i className="fas fa-minus-circle"></i>
                 </button>
               </div>
-              <div className="interest">{interest.interest}</div>
               <div className= 'button-container' onClick={(e) => this.props.getPlaces(interest)}>
               <button className="marker-icon mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
                   style={interest.css}>
                 <i className="fas fa-map-marker"></i>
               </button>
             </div>
-            <hr></hr>
+              <div className="interest">{interest.interest}</div>
+            <hr className='bottom-hr'></hr>
             </li>
+          </div>
           ))
         }
         <div>
-          <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-            onClick={this.props.removeMarkers}>
-          Remove Markers
-          </button>
+          <div className='remove-button-container'>
+            <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+              onClick={this.props.removeMarkers}>
+            Remove All Markers
+            </button>
+          </div>
         </div>
       </div>
     )

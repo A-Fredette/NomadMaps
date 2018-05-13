@@ -15,209 +15,13 @@ const darkTheme =  [
 ]
 
 const lightTheme = [
-    {
-        "featureType": "water",
-        "stylers": [
-            {
-                "color": "#19a0d8"
-            }
-        ]
-    },
-    {
-        "featureType": "administrative",
-        "elementType": "labels.text.stroke",
-        "stylers": [
-            {
-                "color": "#ffffff"
-            },
-            {
-                "weight": 6
-            }
-        ]
-    },
-    {
-        "featureType": "administrative",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#e85113"
-            }
-        ]
-    },
-    {
-        "featureType": "road.highway",
-        "elementType": "geometry.stroke",
-        "stylers": [
-            {
-                "color": "#efe9e4"
-            },
-            {
-                "lightness": -40
-            }
-        ]
-    },
-    {
-        "featureType": "road.arterial",
-        "elementType": "geometry.stroke",
-        "stylers": [
-            {
-                "color": "#efe9e4"
-            },
-            {
-                "lightness": -20
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "labels.text.stroke",
-        "stylers": [
-            {
-                "lightness": 100
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "lightness": -100
-            }
-        ]
-    },
-    {
-        "featureType": "road.highway",
-        "elementType": "labels.icon"
-    },
-    {
-        "featureType": "landscape",
-        "elementType": "labels",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "featureType": "landscape",
-        "stylers": [
-            {
-                "lightness": 20
-            },
-            {
-                "color": "#efe9e4"
-            }
-        ]
-    },
-    {
-        "featureType": "landscape.man_made",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "labels.text.stroke",
-        "stylers": [
-            {
-                "lightness": 100
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "lightness": -100
-            }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "hue": "#11ff00"
-            }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "labels.text.stroke",
-        "stylers": [
-            {
-                "lightness": 100
-            }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "labels.icon",
-        "stylers": [
-            {
-                "hue": "#4cff00"
-            },
-            {
-                "saturation": 58
-            }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "geometry",
-        "stylers": [
-            {
-                "visibility": "on"
-            },
-            {
-                "color": "#f0e4d3"
-            }
-        ]
-    },
-    {
-        "featureType": "road.highway",
-        "elementType": "geometry.fill",
-        "stylers": [
-            {
-                "color": "#efe9e4"
-            },
-            {
-                "lightness": -25
-            }
-        ]
-    },
-    {
-        "featureType": "road.arterial",
-        "elementType": "geometry.fill",
-        "stylers": [
-            {
-                "color": "#efe9e4"
-            },
-            {
-                "lightness": -10
-            }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "labels",
-        "stylers": [
-            {
-                "visibility": "simplified"
-            }
-        ]
-    }
-]
+  {"featureType": "water","stylers": [{"color": "#19a0d8"}]}, {"featureType": "administrative","elementType": "labels.text.stroke","stylers": [{"color": "#ffffff"}, {"weight": 6}]}, {"featureType": "administrative","elementType": "labels.text.fill","stylers": [{"color": "#e85113"}]}, {"featureType": "road.highway","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -40}]}, {"featureType": "road.arterial","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -20}]},{"featureType": "road","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "road","elementType": "labels.text.fill","stylers": [{"lightness": -100}]},
+  {"featureType": "road.highway","elementType": "labels.icon"}, {"featureType": "landscape","elementType": "labels","stylers": [{"visibility": "off"}]}, {"featureType": "landscape","stylers": [{"lightness": 20}, {"color": "#efe9e4"}]}, {"featureType": "landscape.man_made","stylers": [{"visibility": "off"}]}, {"featureType": "water","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "water","elementType": "labels.text.fill","stylers": [{"lightness": -100}]}, {"featureType": "poi","elementType": "labels.text.fill","stylers": [{"hue": "#11ff00"}]}, {"featureType": "poi","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "poi","elementType": "labels.icon","stylers": [{"hue": "#4cff00"}, {"saturation": 58}]}, {"featureType": "poi","elementType": "geometry","stylers": [{"visibility": "on"}, {"color": "#f0e4d3"}]}, {"featureType": "road.highway","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -25}]}, {"featureType": "road.arterial","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -10}]}, {"featureType": "poi","elementType": "labels","stylers": [{"visibility": "simplified"}]}]
 
 class Map extends Component {
   state = {
     map: {},
-    address: '',
-    bounds: ''
+    address: ''
   }
 
   //creates and draws the initial map and stores it in this.props.map (app.js)
@@ -251,36 +55,45 @@ class Map extends Component {
    render() {
      return (
        <div className='map-area'>
-          <form className='location-search' onSubmit={this.goToLocation}>
-            <div className="mdl-textfield mdl-js-textfield">
-              <input
-                type='text'
-                placeholder='Where to, Nomad?'
-                className='mdl-textfield__input location-search'
-                value={this.state.address}
-                onChange={(e) => this.updateAddress(e.target.value)}/>
-                <label
-                  className='mdl-textfield__label'
-                  >Text...
-                </label>
-             <input
-                id='go-to-button'
-                type='submit'
-                className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                value='Search'/>
-           </div>
-         </form>
-         <div className='theme-options'>
-           <h5>Theme Options</h5>
-           <button
-             className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-             onClick={this.darkTheme}>
-             Dark</button>
-           <button
-             className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-             onClick={this.lightTheme}>
-             Light</button>
+         <div className='header'>
+           <div className='search-bar'>
+            <form className='location-search' onSubmit={this.goToLocation}>
+              <div className="mdl-textfield mdl-js-textfield">
+                <input
+                  type='text'
+                  placeholder='Where to, Nomad?'
+                  className='mdl-textfield__input location-search'
+                  value={this.state.address}
+                  onChange={(e) => this.updateAddress(e.target.value)}/>
+                  <label
+                    className='mdl-textfield__label'
+                    >Text...
+                  </label>
+                  <div className='search-button'>
+                   <input
+                      id='go-to-button'
+                      type='submit'
+                      className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                      value='Search'/>
+                </div>
+             </div>
+           </form>
          </div>
+         <div className='theme-options'>
+           <div className='theme-button-container'>
+             <button
+               className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               onClick={this.darkTheme}>
+               Dark
+             </button>
+             <button
+               className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               onClick={this.lightTheme}>
+               Light
+             </button>
+            </div>
+         </div>
+       </div>
          <div id='map' style={mapStyle}></div>
        </div>
      )

@@ -8,7 +8,6 @@ class ListView extends Component {
   }
 
   //TODO: (Not required for graudation) Set google auto complete search boxes
-
   //Display all markers in the markers prop
   resetMarkers = () => {
     for (let marker in this.props.markers) {
@@ -44,12 +43,18 @@ class ListView extends Component {
     let findIndex = this.props.markers.findIndex(thisMarker => thisMarker.id === e.id)
     let marker = this.props.markers[findIndex] //find associated marker by matching IDs
 
-    marker.setAnimation(google.maps.Animation.BOUNCE) //set and timeout marker animation (one bounce)
-    setTimeout(() => {
-      marker.setAnimation(null)
-    }, 750)
+    if (marker.clickCount === 0) {
+      marker.setAnimation(google.maps.Animation.BOUNCE) //set and timeout marker animation (one bounce)
+      setTimeout(() => {
+        marker.setAnimation(null)
+      }, 750)
 
-    marker.infowindow.open(this.props.maps, marker) //open inforwindow
+      marker.infowindow.open(this.props.maps, marker) //open inforwindow
+      marker.clickCount = 1
+    } else {
+      marker.infowindow.close()
+      marker.clickCount = 0
+    }
   }
 
 //includes conditional logic for applying filter when drop down filter menu is used
@@ -72,7 +77,7 @@ class ListView extends Component {
             <div>
             {this.props.places.filter(place => place.interest === this.state.filter).map((place) => (
                 <div className='interest-list' key={place.interest}>
-                  <div>{place.interest}</div>
+                  <div className='interest-header'><h6>{place.interest}</h6></div>
                   <hr></hr>
                   {place.locations.map((place) =>(
                     <li key={place.id} id={place.id} onClick={(e) => this.clickMarker(e.target)}>{place.name}</li>
@@ -80,12 +85,13 @@ class ListView extends Component {
                 </div>
               ))
             }
+            <hr></hr>
           </div>
         ) : (
           <div>
             {this.props.places.map((place) => (
                 <div className='interest-list' key={place.interest}>
-                  <div>{place.interest}</div>
+                  <div className='interest-header'><h6>{place.interest}</h6></div>
                   <hr></hr>
                   {place.locations.map((place) =>(
                     <li key={place.id} id={place.id} onClick={(e) => this.clickMarker(e.target)}>{place.name}</li>

@@ -4,29 +4,109 @@ body {
   font-family: sans-serif;
 }
 
+#autocomplete {
+  box-shadow: 0 0px 0px 0 rgba(0,0,0,.14), 0 1px 1px -1px rgba(0,0,0,.2), 0 0px 1px 0 rgba(0,0,0,.12);
+  height: 29px;
+  font-family: "Helvetica","Arial",sans-serif;
+  font-size: 14px;
+  padding-top: 0;
+}
+
+.filter {
+  margin-top: 10px;
+}
+
+#add-interest-button {
+  margin-left: 10px;
+}
+
+#places-button,
+#list-button {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.list-filter {
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.bottom-hr {
+  margin-left: 0;
+}
+
+.interest-header {
+  text-align: center;
+  font-family: "Helvetica","Arial",sans-serif;
+}
+
+.interest-list li {
+  margin-left: 10px;
+  font-family: "Helvetica","Arial",sans-serif;
+  font-weight: bold;
+  color: #000;
+  margin-top: 2px;
+}
+
+.interest-list li:hover {
+  color: grey;
+}
+
 .button-container,
 .interest {
   display: inline-block;
   padding-right: 5px;
   padding-top: 10px;
+  margin-left: 10px;
 }
 
 .interest {
-  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-family: "Helvetica","Arial",sans-serif;
   font-weight: bold;
-  padding-left: 10px;
+  color: #000;
+}
+
+.header {
+  position: absolute;
+  z-index: 1;
+  background: none;
+}
+
+.search-bar {
+  display: inline-block;
+  width: 50%;
+  height: auto;
+}
+
+.search-button {
+  margin-top: 20px;
+  width: auto;
+  height: auto;
 }
 
 .theme-options {
   display: inline-block;
-  padding-left: 355px;
+  float: right;
+  margin-top: 10px;
+  margin-left: 240px;
 }
 
-/*.theme-options h5 {
+.theme-options button {
+  margin-right: 10px;
+}
+
+.theme-button-container{
+  display: inline-block;
   float: left;
-  margin-top: 0px;
-  font-size: 1em;
-}*/
+}
+
+.location-search div {
+  padding-bottom: 0;
+}
+
+#go-to-button {
+  margin-top: 10px;
+}
 
 .button-container .mdl-button--fab {
   font-size: 14px;
@@ -34,6 +114,10 @@ body {
 
 .marker-icon {
   background-color: #000 !important;
+}
+
+.mdl-textfield {
+  padding-top: 10px;
 }
 
 .mdl-button {
@@ -45,6 +129,11 @@ body {
   width: 25px;
 }
 
+.mdl-textfield__input {
+  background-color: #FFF;
+  height: 26px;
+}
+
 .map-area {
   float: right;
   display: inline-block;
@@ -52,8 +141,8 @@ body {
 }
 
 .sidebar {
-  background-color: #449212;
-  width: 20vw;
+  background-color: #FFF;
+  width: 20%;
   height: 100vh;
   float: left;
   display: inline-block;
@@ -64,13 +153,33 @@ body {
   color: white;
 }
 
+.sidebar::-webkit-scrollbar-track {
+  background-color: #000;
+}
+
 .interest-list {
   list-style: none;
 }
 
 .location-search {
-  clear: left;
-  padding-left: 100px;
+  clear: both;
+  padding-left: 140px;
   display: inline-block;
-  float: left;
+}
+
+.powered-by-container {
+  color: #000;
+  margin: 20px 10px;
+}
+
+.foursquare-logo,
+.google-logo {
+  font-size: 2.3em;
+  margin: 20px;
+}
+
+.remove-button-container {
+  display: block;
+  margin-left: 10px;
+  color: red !important;
 }

@@ -46,9 +46,18 @@ class App extends Component {
       color: colors.blue,
       css: {color: '#778ee1'},
       calls: 0
-      }
+    }
     ],
     places: []
+  }
+
+  //sets markers for interests that are set in the initial interests state
+  componentDidMount = () => {
+    setTimeout(() => {
+      for (const each in this.state.interests) {
+        this.getPlaces(this.state.interests[each])
+      }
+    }, 2000)
   }
 
   //utility function for creating a GUID
@@ -108,7 +117,7 @@ class App extends Component {
     this.setState({interests: this.state.interests.concat([newInterest])}) //set interest with associated color
   }
 
-  //removes places about deleted interests from this.state.places
+  //removes places associated with deleted interests from this.state.places
   removePlaces = (deletedInterest) => {
     let filteredPlaces = this.state.places.filter(place => place.interest !== deletedInterest)
     this.setState({places: filteredPlaces})
@@ -129,7 +138,26 @@ class App extends Component {
       }
     }
     this.removePlaces(target.interest)
+  }
+
+  //reset the calls number of all interests
+  resetMarkerCalls = () => {
+    let updatedInterests = this.state.interests
+    for (let interest in updatedInterests) {
+      updatedInterests[interest].calls = 0
     }
+    this.setState({interests: updatedInterests})
+  }
+
+  //removes all markers from the map, resets marker calls and removes all places
+  removeMarkers = () => {
+    let updatedInterests = this.state.interests
+    for (let marker in this.state.markers) {
+      this.state.markers[marker].setMap(null)
+    }
+    this.resetMarkerCalls()
+    this.setState({places: []})
+  }
 
   //view list view in sidebar
   viewList = (event) => {
@@ -148,141 +176,9 @@ class App extends Component {
     this.setState({map: map})
   }
 
-  requestError(error) {
-    console.log(error)
-    return 'no match'
-  }
-
-  //method for getting location information from Foursquare's API
-  foursquareId = (lat, lng, name) => {
-    fetch(`https://api.foursquare.com/v2/venues/search?ll=${lat},${lng}&intent=match&name=${name}&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
-    {
-    method: 'GET'
-    })
-    //.then(response => this.handleErrors(response, name))
-    .then(response => response.json())
-    .then(data => {
-      if (data.response.venues.length >= 1) {
-        const info = data.response.venues[0].id
-        addId(info)
-      } else {
-        return 'no match'
-      }
-    })
-    .catch(error => this.requestError(error))
-
-  function addId(data) {
-    console.log(data)
-    return data
-  }
-
-  function requestError(error) {
-    console.log(error)
-    return 'no match'
-  }
-}
-
-getPhotos = (foursquareId) => {
-  fetch(`https://api.foursquare.com/v2/venues/${foursquareId}/photos?&limit=1&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
-  {
-  method: 'GET'
-  })
-.then(response => this.handleErrors(response))
-.then(response => response.json())
-.then(data => { //keeping this step in case use is expanded to multiple images
-  let photosArray = data.response.photos.items
-    return photosArray
-  })
-.then(photos => {
-  for (let eachFoto in photos) {
-    addURL(photos[eachFoto].prefix+'width150'+photos[eachFoto].suffix)
-  }})
-.catch(error => photoError(error))
-
-  function addURL(data) {
-    console.log(data)
-    return data
-  }
-
-  function photoError(error) {
-    console.log(error)
-    return 'http://via.placeholder.com/150x150'
-  }
-}
-
-
-  //creates a marker and associated infowindow
-  createMarker = (interest, response) => {
-    for (let place in response) {
-      const lat = response[place].geometry.location.lat()
-      const lng = response[place].geometry.location.lng()
-      const id = response[place].id //GUID
-      const name = response[place].name
-      const hours = '9-5'
-
-      //const foursquareId = this.foursquareId(lat, lng, name)
-      const imageURL = 'http://via.placeholder.com/350x150'
-
-      const infowindow = new google.maps.InfoWindow({
-        content: `<div className='infowindow-div'>
-            <h4 className='name'>${name}</h4>
-            <div className='picture-container'>
-              <img src=${imageURL} alt=${name}></img>
-            </div>
-            <div className='hours'>
-              <p className='hours-text'>${hours}</p>
-            </div>
-          </div>`
-      })
-      const marker = new google.maps.Marker({   //creating the marker
-        position: {lat: lat, lng: lng},
-        animation: google.maps.Animation.DROP,
-        id: id,
-        infowindow: infowindow, //storing infowindow in marker for easy access
-        interest: interest
-      })
-      //adding event listener for click
-      marker.addListener('click', () => {
-        infowindow.open(this.state.map, marker)
-        marker.setAnimation(google.maps.Animation.BOUNCE)
-        setTimeout(() => {
-          marker.setAnimation(null)
-        }, 750)
-      })
-      marker.setIcon(interest.color)
-      marker.setMap(this.state.map) //places marker on map
-      this.setState({markers: this.state.markers.concat(marker)})
-    }
-  }
-
   //add places to state
   addPlaces = (interest, response) => {
     this.setState({places: this.state.places.concat({interest: interest.interest, locations: response})})
-  }
-
-  //gets places via google API from interest and locations that are stored in state
-  //TODO: Update to fetch request
-  getPlaces = (interest) => {
-    if (interest.calls === 0) {
-      console.log('get places fired')
-      let targetInterest = interest.interest
-      let service = new google.maps.places.PlacesService(this.state.map)
-      service.textSearch( //must provide location to return results
-        {query: targetInterest,
-        location: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng},
-        radius: '300'}, ((response, status) => {
-        console.log('status: ', status)
-        if (status === 'OK') {
-          this.addPlaces(interest, response)
-          this.createMarker(interest, response)
-        } else {
-          console.log('Places text search failed ', status)
-          window.alert('No results')
-        }
-      }))
-      interest.calls = 1
-    }
-
   }
 
   //Finds the lat/lng coordinates of an address or location string
@@ -292,8 +188,13 @@ getPhotos = (foursquareId) => {
       if (status === 'OK') {
         let lat = response[0].geometry.location.lat()
         let lng = response[0].geometry.location.lng()
+        this.setState({places: []}) //remove all places
         this.state.map.setCenter({lat:lat, lng:lng}) //centers the map at the new coordinates
         this.setState({mapCenter: {lat:lat, lng:lng} }) //update the lat/lng state for access by other methos
+        this.resetMarkerCalls() //reset marker calls
+        for (const each in this.state.interests) { //get places/markers for new location
+          this.getPlaces(this.state.interests[each])
+        }
       } else {
         console.log('Geocoder unsuccessful: ', status)
         window.alert('Unable to find location, please try again')
@@ -302,157 +203,177 @@ getPhotos = (foursquareId) => {
     }))
   }
 
-  //removes all markers from the map
-  //TODO: also remove all places and reset interest.calls so they can be used again
-  removeMarkers = () => {
-    for (let marker in this.state.markers) {
-      this.state.markers[marker].setMap(null)
-    }
-  }
-
   //method for handling fetch errors
   handleErrors = (response, info) => {
     if (!response.ok) {
       console.log('name of  failed search: ', info)
-      throw Error(response.statusText)
+      throw error('name of  failed search: ', info)
+      //window.alert("There's and issue getting information from either Google or Foursquare. Please close the window and try again later.", response.statusText)
     }
     return response
   }
 
-  //sets markers for interests that are set in the initial interests state
-  componentDidMount = () => {
-    setTimeout(() => {
-      for (const each in this.state.interests) {
-        this.getPlaces(this.state.interests[each])
-      }
-    }, 2000)
-
-    const lat = 52.510626
-    const lng = 13.442224
-    const name = 'Berghain'
-
-    this.getHours('57d2e7d1498eba92c602ce4e')
-  }
-
-  getHours = (venueId) => {
-    fetch(`https://api.foursquare.com/v2/venues/${venueId}/hours?&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`, {
-      method: 'GET'
-    })
-    .then(response => this.handleErrors(response))
-    .then(response => response.json())
-    .then(data => {
-      console.log(data.response.hours.timeframes[0].open[0])
-    })
-  }
-
-  //creates an info window by calling google API.
-  //populates window with data from Foursquare API.
-  createInfoWindow = (lat, lng, name) => {
-    let info = {
-      foursquareId: null,
-      photoURL: null,
-      hours: null
+  //gets places via google API from interest and locations that are stored in state
+  getPlaces = (interest) => {
+    if (interest.calls === 0) {
+      let targetInterest = interest.interest
+      let service = new google.maps.places.PlacesService(this.state.map)
+      service.textSearch( //must provide location to return results
+        {query: targetInterest,
+        rankby: prominence, //ranks by prominence of location. remove line if buggy.
+        location: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng},
+        radius: '300'}, ((response, status) => {
+        if (status === 'OK') {
+          this.addPlaces(interest, response) //add places to state
+          for (let place in response){
+            this.foursquareInfo(response[place], interest) //get place info, create Google InfoWindow and Markers
+          }
+        } else {
+          console.log('Places text search failed ', status)
+          window.alert('No results')
+        }
+      }))
+      interest.calls = 1
     }
+  }
 
-    fetch(`https://api.foursquare.com/v2/venues/search?ll=${lat},${lng}&intent=match&name=${name}&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
-    {
-    method: 'GET'
+  //aync function for getting Foursquare Venue ID based on coordinates and name
+  //returns a object with info for the venue
+  getId = (lat, lng, name, info) => {
+    return new Promise((resolve, reject) => {
+      info.name = name
+      fetch(`https://api.foursquare.com/v2/venues/search?ll=${lat},${lng}&llAcc=1000&intent=match&name=${name}&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+      { method: 'GET'})
+      .then(response => this.handleErrors(response, name))
+      .then(response => {
+        return response.json()})
+      .then(data => {
+        if (data.response.venues.length >= 1) {
+          info.foursquareId = data.response.venues[0].id
+          info.link = `http://foursquare.com/v/${info.foursquareId}`
+          resolve(info)
+        } else {
+          info.foursquareId = 'no match'
+          resolve(info)
+        }
+      }).catch(error => console.log(error))
     })
-    .then(response => this.handleErrors(response))
-    .then(response => response.json())
-    .then(data => {
-      info.foursquareId = data.response.venues[0].id
-      console.log(info.foursquareId) //venue ID
-      //fetch call for venue photos
-      return fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/photos?&limit=1&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
-      {
-      method: 'GET'
-      })
-    })
-    .then(response => this.handleErrors(response))
-    .then(response => response.json())
-    .then(data => { //keeping this step in case use is expanded to multiple images
-      let photosArray = data.response.photos.items
+  }
+
+  //async function for getting Foursquare photos of a venue
+  getPhotos = (info) => {
+    return new Promise((resolve, reject) => {
+      if (info.foursquareId === 'no match') {
+        info.photoURL = 'Kein Foto'
+        resolve(info)
+      } else {
+        fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/photos?&limit=1&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+        { method: 'GET' })
+      .then(response => {
+        return response.json()
+      }).then(data => { //keeping this step in case use is expanded to multiple images
+        let photosArray = data.response.photos.items
         return photosArray
-      })
-    .then(photos => {
-      for (let eachFoto in photos) {
-        info.photoURL = photos[eachFoto].prefix+'width150'+photos[eachFoto].suffix
-        console.log(info.photoURL) //returns URL of photo to be used in InfoWindow
-      }})
-      return fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/hours?&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
-        {
-          method: 'GET'
-        })
-        .then(response => this.handleErrors(response))
-        .then(response => response.json())
-        .then(data => {
-          info.hours = data.response.hours.timeframes[0].open[0].start+' to '+data.response.hours.timeframes[0].open[0].end
-        })
-        .then(this.createWindow(name, info.photoURL, info.hours)) //creates a Google InfoWindow
-        .then(this.createMarker())
-  }
+      }).then(photos => {
+        info.photoURL = (photos[0]) ? photos[0].prefix+'width150'+photos[0].suffix : 'Kein Foto'
+        resolve(info)
+    }).catch(error => console.log(error))
+    }
+  })
+}
 
-  createWindow = (name, imageURL, hours) => {
-    const infowindow = new google.maps.InfoWindow({
-      content: `<div className='infowindow-div'>
-          <h4 className='name'>${name}</h4>
-          <div className='picture-container'>
-            <img src=${imageURL} alt=${name+' image'}></img>
-          </div>
-          <div className='hours'>
-            <p className='hours-text'>${hours}</p>
-          </div>
-        </div>`
-    })
-    return infowindow
-  }
+//async function for getting the Foursquare hours of a location
+getHours = (info) => {
+  return new Promise((resolve, reject) => {
+    if (info.foursquareId === 'no match') {
+      info.hours = 'Hours Not Available'
+      resolve(info)
+    } else {
+      fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/hours?&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+        { method: 'GET' })
+      .then(response => response.json())
+      .then(data => {
+        info.hours = (data.response.hours.timeframes) ? data.response.hours.timeframes[0].open[0] : 'Hours Not Available'
+        resolve(info)})
+      .catch(error => console.log(error))
+    }
+  })
+}
 
-  /*createMarker = (interest, response) => {
-    const lat = response[place].geometry.location.lat()
-    const lng = response[place].geometry.location.lng()
-    const id = response[place].id //GUID
-    const name = response[place].name
-    const hours = '9-5'
+//method for getting location information from Foursquare's API
+//response is a Google places API response (this.getPlaces)
+foursquareInfo = (response, interest) => {
+  const lat = response.geometry.location.lat()
+  const lng = response.geometry.location.lng()
+  const id = response.id //GUID
+  const name = response.name.replace(/[^a-zA-Z ]/g, "") //remove special charecters (source: https://stackoverflow.com/questions/6555182/remove-all-special-characters-except-space-from-a-string-using-javascript)
+  let info = {} //this object will be passed through all async foursquare functions and contain all info needed to create an infowindow
 
-    const marker = new google.maps.Marker({   //creating the marker
-      position: {lat: lat, lng: lng},
-      animation: google.maps.Animation.DROP,
-      id: id,
-      infowindow: infowindow, //storing infowindow in marker for easy access
-      interest: interest
-    })
-    //adding event listener for click
-    marker.addListener('click', () => {
+  this.getId(lat, lng, name, info) //get venue Foursquare ID (async)
+  .then(idResult => {
+    return this.getPhotos(idResult)}) //get venue Photos from Foursquare (async)
+  .then(photoResult => {
+    return this.getHours(photoResult)}) //get venue hours from Foursquare (async)
+  .then(response => {
+    return this.createWindow(name, response)})
+  .then(infowindow => {
+    this.createMarker(lat, lng, name, id, interest, infowindow)})
+  .catch(error => console.log(error))
+}
+
+//creates a marker and associated infowindow
+createMarker = (lat, lng, name, id, interest, infowindow) => {
+  const marker = new google.maps.Marker({   //creating the marker
+    position: {lat: lat, lng: lng},
+    animation: google.maps.Animation.DROP,
+    id: id,
+    infowindow: infowindow, //storing infowindow in marker for easy access
+    interest: interest,
+    clickCount: 0
+  })
+  //event listener for click to open infowindow (close on second click)
+  marker.addListener('click', () => {
+    if (marker.clickCount === 0) {
+      marker.clickCount = 1
       infowindow.open(this.state.map, marker)
       marker.setAnimation(google.maps.Animation.BOUNCE)
       setTimeout(() => {
         marker.setAnimation(null)
       }, 750)
+    } else {
+      infowindow.close()
+      marker.clickCount = 0
+    }
+  })
+  marker.setIcon(interest.color)
+  marker.setMap(this.state.map) //places marker on map
+  this.setState({markers: this.state.markers.concat(marker)})
+}
+
+//create a google infowindow, populated by info from Foursquare API
+createWindow = (name, info) => {
+  let photoHTML = (info.photoURL !== 'Kein Foto') ? `<img src=${info.photoURL} alt=${name+' image'}></img>` : '<h4>No Photos Available</h4>'
+  let hoursHTML = (info.hours !== 'Hours Not Available') ? `<p className='hours-text'>${info.hours.start} to ${info.hours.end}</p>` : `<p className='hours-text'>Hours Not Available</p>`
+  let linkHTML = (info.link) ? `<a href=${info.link}><h4 className='name'>${name}</a>` : `<h4 className='name'>${name}</h4>`
+  const infowindow = new google.maps.InfoWindow({
+    content: `<div className='infowindow-div'>
+        ${linkHTML}
+        <div className='picture-container'>
+          ${photoHTML}
+        </div>
+        <div className='hours'>
+          ${hoursHTML}
+        </div>
+      </div>`
     })
-    marker.setIcon(interest.color)
-    marker.setMap(this.state.map) //places marker on map
-    this.setState({markers: this.state.markers.concat(marker)})
-  } */
+  return infowindow
+}
 
-  /*
-
-places API --> returns a response -->
-fetch API --> uses response to get id, pictures and hours --->
-calls create info window --->
-calls create marker
-
-   */
-
-
-  //TODO:Fetch/XHR for Google Places Calls
-  //TODO:Link back to Foursquare (attribution) https://developer.foursquare.com/docs/terms-of-use/attribution
 
   //TODO:Enable service worker + offline first
 
   //TODO:Enable Focus (tabbing)
   //TODO:Site elements are defined semantically (ARIA)
-  //TODO:Alternative text for all images
   //TODO:Responsive design and styling overhaul
 
   render() {
@@ -490,6 +411,15 @@ calls create marker
               interests={this.state.interests}
             />)
             }
+          </div>
+          <div className='powered-by-container'>
+            <p>Powered By:</p>
+            <div className='google-logo'>
+              <i className="fab fa-google"></i>
+            </div>
+            <div className='foursquare-logo'>
+              <i className="fab fa-foursquare"></i>
+            </div>
           </div>
       </div>
         <Map

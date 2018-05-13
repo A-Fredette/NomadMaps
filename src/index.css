@@ -43,13 +43,14 @@ body {
 .interest-list li {
   margin-left: 10px;
   font-family: "Helvetica","Arial",sans-serif;
-  font-weight: bold;
+  font-weight: 600;
+  letter-spacing: .03em;
   color: #000;
   margin-top: 2px;
 }
 
 .interest-list li:hover {
-  color: grey;
+  color: #3284fe;
 }
 
 .button-container,
@@ -141,7 +142,7 @@ body {
 }
 
 .sidebar {
-  background-color: #FFF;
+  background-color: rgba(137, 134, 158, 0.22);
   width: 20%;
   height: 100vh;
   float: left;
@@ -175,11 +176,31 @@ body {
 .foursquare-logo,
 .google-logo {
   font-size: 2.3em;
-  margin: 20px;
+  margin: 0 20px 0 0;
+  display: inline-block;
+}
+
+.google-logo {
+  color: #3cba54;
+}
+
+.foursquare-logo {
+  color: #f94877;
 }
 
 .remove-button-container {
   display: block;
   margin-left: 10px;
   color: red !important;
+}
+
+/* -- INFOWINDOW -- */
+.name h4 {
+  margin-bottom: 5px;
+  margin-top: 0;
+  font-size: 1.3em;
+}
+
+.infowindow-div img{
+  margin-bottom: 5px;
 }

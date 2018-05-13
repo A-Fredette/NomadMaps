@@ -2,7 +2,7 @@
 /* global google */
 import React, { Component } from 'react'
 import Map from './map.js'
-import Places from './places.js'
+import Interests from './interests.js'
 import ListView from './listview.js'
 import 'whatwg-fetch' //polyfill for fetch
 import './App.css'
@@ -28,7 +28,7 @@ class App extends Component {
     interests: [
       {
       id: '8292a3f9-598a-4f51-b964-424f466e31d0',
-      interest: 'Co Working Spaces',
+      interest: 'Co Working',
       color: colors.green,
       css: {color: '#58f958'},
       calls: 0
@@ -151,7 +151,6 @@ class App extends Component {
 
   //removes all markers from the map, resets marker calls and removes all places
   removeMarkers = () => {
-    let updatedInterests = this.state.interests
     for (let marker in this.state.markers) {
       this.state.markers[marker].setMap(null)
     }
@@ -220,9 +219,8 @@ class App extends Component {
       let service = new google.maps.places.PlacesService(this.state.map)
       service.textSearch( //must provide location to return results
         {query: targetInterest,
-        rankby: prominence, //ranks by prominence of location. remove line if buggy.
         location: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng},
-        radius: '300'}, ((response, status) => {
+        radius: '1'}, ((response, status) => {
         if (status === 'OK') {
           this.addPlaces(interest, response) //add places to state
           for (let place in response){
@@ -352,16 +350,16 @@ createMarker = (lat, lng, name, id, interest, infowindow) => {
 
 //create a google infowindow, populated by info from Foursquare API
 createWindow = (name, info) => {
-  let photoHTML = (info.photoURL !== 'Kein Foto') ? `<img src=${info.photoURL} alt=${name+' image'}></img>` : '<h4>No Photos Available</h4>'
-  let hoursHTML = (info.hours !== 'Hours Not Available') ? `<p className='hours-text'>${info.hours.start} to ${info.hours.end}</p>` : `<p className='hours-text'>Hours Not Available</p>`
-  let linkHTML = (info.link) ? `<a href=${info.link}><h4 className='name'>${name}</a>` : `<h4 className='name'>${name}</h4>`
+  let photoHTML = (info.photoURL !== 'Kein Foto') ? `<img src=${info.photoURL} alt=${name+' image'}></img>` : '<h6>No Photos Available</h6>'
+  let hoursHTML = (info.hours !== 'Hours Not Available') ? `<p class='hours-text'>Open Today: ${info.hours.start} to ${info.hours.end}</p>` : `<p class='hours-text'>Hours Not Available</p>`
+  let linkHTML = (info.link) ? `<a href=${info.link}><h6 class='name'>${name}</h6></a>` : `<h6 class='name'>${name}</h6>`
   const infowindow = new google.maps.InfoWindow({
-    content: `<div className='infowindow-div'>
+    content: `<div class='infowindow-div'>
         ${linkHTML}
-        <div className='picture-container'>
+        <div class='picture-container'>
           ${photoHTML}
         </div>
-        <div className='hours'>
+        <div class='hours'>
           ${hoursHTML}
         </div>
       </div>`
@@ -393,10 +391,10 @@ createWindow = (name, info) => {
               value='List'
               className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
               onClick={(e) => this.viewList(e)}/>
-        </div>
+          </div>
           <div>
             {this.state.view === 'places' ?
-            (<Places
+            (<Interests
               interests={this.state.interests}
               getPlaces={this.getPlaces}
               updateInterest={this.updateInterest}

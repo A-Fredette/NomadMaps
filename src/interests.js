@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import React, { Component } from 'react'
 
-class Places extends Component {
+class Interests extends Component {
   state = {
     query: '',
   }
@@ -13,7 +13,6 @@ componentDidMount = () => {
 //As the user types, update the query state
 updateQuery = (query) => {
   this.setState({query: query}, () => {
-    console.log(this.state.query)
   })
 }
 
@@ -36,7 +35,10 @@ delete = (interest) => {
     return (
       <div>
         <form onSubmit={this.addInterest}>
-          <input id='add-interest-button' className='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent' type='submit' value='Add'/>
+          <input id='add-interest-button'
+            className='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent'
+            type='submit'
+            value='Add'/>
           <input
              id='autocomplete'
              type='text'
@@ -47,16 +49,16 @@ delete = (interest) => {
         <hr></hr>
         {this.props.interests.map((interest) => (
           <div className='interest-container' key={interest.id}>
-            <li className= 'interest-list' key={interest.id}>
+            <li className= 'interest-list' key={interest.id} role='List'>
               <div className= 'button-container' onClick={(e) => this.delete(interest)}>
                 <button className="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-                  <i className="fas fa-minus-circle"></i>
+                  <i className="fas fa-minus-circle" role='Button'></i>
                 </button>
               </div>
               <div className= 'button-container' onClick={(e) => this.props.getPlaces(interest)}>
               <button className="marker-icon mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
                   style={interest.css}>
-                <i className="fas fa-map-marker"></i>
+                <i className="fas fa-map-marker" role='Button'></i>
               </button>
             </div>
               <div className="interest">{interest.interest}</div>
@@ -67,7 +69,8 @@ delete = (interest) => {
         }
         <div>
           <div className='remove-button-container'>
-            <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+            <button
+              className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
               onClick={this.props.removeMarkers}>
             Remove All Markers
             </button>
@@ -78,4 +81,4 @@ delete = (interest) => {
   }
 }
 
-export default Places
+export default Interests

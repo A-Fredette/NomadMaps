@@ -27,7 +27,7 @@ class Map extends Component {
   //creates and draws the initial map and stores it in this.props.map (app.js)
   componentDidMount = () => {
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 13,
+        zoom: 15,
         center: {lat: 52.5200, lng: 13.4050}
     })
     this.props.setMap(map)

@@ -4,16 +4,19 @@ body {
   font-family: sans-serif;
 }
 
+/* --SIDEBAR-- */
 #autocomplete {
   box-shadow: 0 0px 0px 0 rgba(0,0,0,.14), 0 1px 1px -1px rgba(0,0,0,.2), 0 0px 1px 0 rgba(0,0,0,.12);
   height: 29px;
   font-family: "Helvetica","Arial",sans-serif;
   font-size: 14px;
   padding-top: 0;
+  min-width: 107px;
+  width: 45%;
 }
 
 .filter {
-  margin-top: 10px;
+  margin: 20px 0 5px 0;
 }
 
 #add-interest-button {
@@ -43,13 +46,14 @@ body {
 .interest-list li {
   margin-left: 10px;
   font-family: "Helvetica","Arial",sans-serif;
-  font-weight: bold;
-  color: #000;
+  font-weight: 500;
+  letter-spacing: .03em;
+  color: rgb(106, 187, 249);
   margin-top: 2px;
 }
 
 .interest-list li:hover {
-  color: grey;
+  color: #FFF;
 }
 
 .button-container,
@@ -63,51 +67,199 @@ body {
 .interest {
   font-family: "Helvetica","Arial",sans-serif;
   font-weight: bold;
-  color: #000;
+  color: rgb(198, 198, 198);
 }
 
-.header {
-  position: absolute;
-  z-index: 1;
-  background: none;
-}
-
-.search-bar {
-  display: inline-block;
-  width: 50%;
-  height: auto;
-}
-
-.search-button {
-  margin-top: 20px;
-  width: auto;
-  height: auto;
-}
-
-.theme-options {
-  display: inline-block;
-  float: right;
-  margin-top: 10px;
-  margin-left: 240px;
-}
-
-.theme-options button {
-  margin-right: 10px;
-}
-
-.theme-button-container{
-  display: inline-block;
+.sidebar {
+  background-color: rgb(56, 56, 56);
+  min-width: 220px;
+  width: 20%;
+  height: 100vh;
   float: left;
+  display: inline-block;
+  overflow: scroll;
+  z-index: 1;
+  position: absolute;
+}
+
+.sidebar h3 {
+  color: white;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background-color: #000;
+}
+
+.interest-list {
+  list-style: none;
+}
+
+.hide {
+  display: none;
+}
+
+.location-search {
+  clear: both;
+  padding-left: 100px;
+  display: inline-block;
+  position: absolute;
+  top: 10px;
+  left: 22%;
 }
 
 .location-search div {
   padding-bottom: 0;
 }
 
+.powered-by-container {
+  color: rgb(198, 198, 198);
+  margin: 20px 10px;
+}
+
+.foursquare-logo,
+.google-logo {
+  font-size: 2.3em;
+  margin: 0 20px 0 0;
+  display: inline-block;
+}
+
+.google-logo {
+  color: #3cba54;
+}
+
+.foursquare-logo {
+  color: #f94877;
+}
+
+.remove-button-container {
+  display: block;
+  margin-left: 10px;
+}
+
+/* --HEADER-- */
+.header {
+  z-index: 1;
+  background: none;
+  width: 80%;
+}
+
+@media only screen and (max-width : 1005px) {
+  .header {
+    left: 200px;
+  }
+}
+
+@media only screen and (max-width : 450px) {
+  .header {
+    width: 100%;
+  }
+}
+
+.search-bar {
+  display: inline-block;
+  width: 50%;
+  height: auto;
+  position: absolute;
+  z-index: 1;
+}
+
+.search {
+  width: 65%;
+  margin-left: 1px;
+  height: 27px !important;
+}
+
+@media only screen and (max-width : 755px) {
+  .search {
+    margin-left: -66px;
+    width: 50%;
+  }
+  .location-search {
+    padding-left: 200px;
+  }
+}
+
+.search-button {
+  margin: 20px 0 0 24px;
+  width: auto;
+  height: auto;
+}
+
+#go-to-button {
+  position: absolute;
+  top: 0px;
+}
+
+.theme-options {
+  display: inline-block;
+  margin: 15px 10px 0
+}
+
+.theme-options button {
+  margin-right: 10px;
+}
+
+.theme-button-container {
+  display: inline-block;
+  float: left;
+}
+
+.hamburger-container {
+  margin: 20px 0 0 20px;
+  display: inline-block;
+  position: absolute;
+  z-index: 1;
+}
+
+@media only screen and (max-width : 1135px) {
+  .hamburger-container {
+    left: 230px;
+  }
+}
+
+.fa-bars,
+.fa-window-close {
+  color: rgb(68,138,255);
+  font-size: 30px;
+}
+
+.fa-window-close {
+  float:right;
+  text-align: right;
+  margin: 5px 10px 0 0;
+}
+
+.close-button-container {
+  text-align: right;
+  display: block;
+  height: 25px;
+  margin: 5px 10px 0 0;
+}
+
+.fa-bars:hover,
+.fa-window-close:hover {
+  color: #FFF;
+}
+
 #go-to-button {
   margin-top: 10px;
 }
 
+/* --MAP-- */
+.loading-map {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1
+}
+
+#map {
+  display: 'inline-block';
+  position: inherit !important;
+  z-index: 2;
+}
+
+/* --MATERIAL DESIGNS-- */
 .button-container .mdl-button--fab {
   font-size: 14px;
 }
@@ -140,46 +292,22 @@ body {
   width: 80%;
 }
 
-.sidebar {
-  background-color: #FFF;
-  width: 20%;
-  height: 100vh;
-  float: left;
-  display: inline-block;
-  overflow: scroll;
+.mdl-button:hover {
+  background-color: #FFF !important;
+  color: rgb(68,138,255) !important;
 }
 
-.sidebar h3 {
-  color: white;
+input:hover {
+  color: rgb(68,138,255) !important;
 }
 
-.sidebar::-webkit-scrollbar-track {
-  background-color: #000;
+/* -- INFOWINDOW -- */
+.name h4 {
+  margin-bottom: 5px;
+  margin-top: 0;
+  font-size: 1.3em;
 }
 
-.interest-list {
-  list-style: none;
-}
-
-.location-search {
-  clear: both;
-  padding-left: 140px;
-  display: inline-block;
-}
-
-.powered-by-container {
-  color: #000;
-  margin: 20px 10px;
-}
-
-.foursquare-logo,
-.google-logo {
-  font-size: 2.3em;
-  margin: 20px;
-}
-
-.remove-button-container {
-  display: block;
-  margin-left: 10px;
-  color: red !important;
+.infowindow-div img{
+  margin-bottom: 5px;
 }

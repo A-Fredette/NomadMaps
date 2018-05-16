@@ -8,6 +8,7 @@ class ListView extends Component {
   }
 
   //TODO: (Not required for graudation) Set google auto complete search boxes
+
   //Display all markers in the markers prop
   resetMarkers = () => {
     for (let marker in this.props.markers) {
@@ -64,10 +65,10 @@ class ListView extends Component {
       <div>
         <div className='list-filter'>
           <div>
-          <select value={this.state.value} onChange={(e) => this.updateFilter(e.target.value)}>
+          <select value={this.state.value} role='Menu' onChange={(e) => this.updateFilter(e.target.value)}>
             <option value='No Filter'>No Filter</option>
             {this.props.interests.map((interest) => (
-                <option key={interest.id} value={interest.interest}>{interest.interest}</option>
+                <option key={interest.id} role='Menuitem' value={interest.interest}>{interest.interest} </option>
             ))}
             </select>
           </div>
@@ -77,7 +78,7 @@ class ListView extends Component {
             <div>
             {this.props.places.filter(place => place.interest === this.state.filter).map((place) => (
                 <div className='interest-list' key={place.interest}>
-                  <div className='interest-header'><h6>{place.interest}</h6></div>
+                  <div className='interest-header' role='Heading'><h6>{place.interest}</h6></div>
                   <hr></hr>
                   {place.locations.map((place) =>(
                     <li key={place.id} id={place.id} onClick={(e) => this.clickMarker(e.target)}>{place.name}</li>
@@ -91,7 +92,7 @@ class ListView extends Component {
           <div>
             {this.props.places.map((place) => (
                 <div className='interest-list' key={place.interest}>
-                  <div className='interest-header'><h6>{place.interest}</h6></div>
+                  <div className='interest-header' role='Heading'><h6>{place.interest}</h6></div>
                   <hr></hr>
                   {place.locations.map((place) =>(
                     <li key={place.id} id={place.id} onClick={(e) => this.clickMarker(e.target)}>{place.name}</li>

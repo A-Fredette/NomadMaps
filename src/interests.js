@@ -33,6 +33,7 @@ delete = (interest) => {
   //TODO: (not for graduation) allow users to customize the color of the markers
   render() {
     return (
+    <div>
       <div>
         <form onSubmit={this.addInterest}>
           <input id='add-interest-button'
@@ -42,7 +43,7 @@ delete = (interest) => {
           <input
              id='autocomplete'
              type='text'
-             placeholder='Add an Interest'
+             placeholder='  Add Interest'
              value={this.state.query}
              onChange={(e) => this.updateQuery(e.target.value)}/>
         </form>
@@ -75,6 +76,7 @@ delete = (interest) => {
             Remove All Markers
             </button>
           </div>
+        </div>
         </div>
       </div>
     )

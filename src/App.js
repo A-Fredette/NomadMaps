@@ -16,6 +16,16 @@ const colors = {
   state: 4
 }
 
+const darkTheme =  [
+  {"featureType": "all","elementType": "all","stylers": [{"invert_lightness": true},{"saturation": "-9"},{"lightness": "0"},{"visibility": "simplified"}]},{"featureType": "landscape.man_made","elementType": "all","stylers": [{"weight": "1.00"}]},{"featureType": "road.highway","elementType": "all","stylers": [{"weight": "0.49"}]},
+  {"featureType": "road.highway","elementType": "labels","stylers": [{"visibility": "on"},{"weight": "0.01"},{"lightness": "-7"},{"saturation": "-35"}]},{"featureType": "road.highway","elementType": "labels.text","stylers": [{"visibility": "on"}]},
+  {"featureType": "road.highway","elementType": "labels.text.stroke","stylers": [{"visibility": "off"}]},{"featureType": "road.highway","elementType": "labels.icon","stylers": [{"visibility": "on"}]}
+]
+
+const lightTheme = [
+  {"featureType": "water","stylers": [{"color": "#19a0d8"}]}, {"featureType": "administrative","elementType": "labels.text.stroke","stylers": [{"color": "#ffffff"}, {"weight": 6}]}, {"featureType": "administrative","elementType": "labels.text.fill","stylers": [{"color": "#e85113"}]}, {"featureType": "road.highway","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -40}]}, {"featureType": "road.arterial","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -20}]},{"featureType": "road","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "road","elementType": "labels.text.fill","stylers": [{"lightness": -100}]},
+  {"featureType": "road.highway","elementType": "labels.icon"}, {"featureType": "landscape","elementType": "labels","stylers": [{"visibility": "off"}]}, {"featureType": "landscape","stylers": [{"lightness": 20}, {"color": "#efe9e4"}]}, {"featureType": "landscape.man_made","stylers": [{"visibility": "off"}]}, {"featureType": "water","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "water","elementType": "labels.text.fill","stylers": [{"lightness": -100}]}, {"featureType": "poi","elementType": "labels.text.fill","stylers": [{"hue": "#11ff00"}]}, {"featureType": "poi","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "poi","elementType": "labels.icon","stylers": [{"hue": "#4cff00"}, {"saturation": 58}]}, {"featureType": "poi","elementType": "geometry","stylers": [{"visibility": "on"}, {"color": "#f0e4d3"}]}, {"featureType": "road.highway","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -25}]}, {"featureType": "road.arterial","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -10}]}, {"featureType": "poi","elementType": "labels","stylers": [{"visibility": "simplified"}]}]
+
 class App extends Component {
   state = {
     view: 'places',
@@ -58,6 +68,20 @@ class App extends Component {
         this.getPlaces(this.state.interests[each])
       }
     }, 2000)
+
+    //event listener for window resizing
+
+    window.onresize = () => {
+      this.resizeMap()
+    }
+  }
+
+  //resize the map according to the window size
+  //source: https://codepen.io/alexgill/pen/NqjMma
+  resizeMap = () => {
+    let center = this.state.map.getCenter()
+    google.maps.event.trigger(this.state.map, 'resize')
+    this.state.map.setCenter(center)
   }
 
   //utility function for creating a GUID
@@ -183,6 +207,7 @@ class App extends Component {
   //Finds the lat/lng coordinates of an address or location string
   findCenter = (address) => {
     let geocoder = new google.maps.Geocoder()
+    this.removeMarkers()
     geocoder.geocode({address: address}, ((response, status) => {
       if (status === 'OK') {
         let lat = response[0].geometry.location.lat()
@@ -367,17 +392,48 @@ createWindow = (name, info) => {
   return infowindow
 }
 
+//when triggered (click), hide the side bar and expand the map and header areas
+hideSidebar = () => {
+  const width = window.innerWidth
+  if (width < 1005) {
+    document.getElementsByClassName('header')[0].style.left = '3%'
+  }
+
+  if (width < 650) {
+    document.getElementsByClassName('location-search ')[0].style.remove('hide')
+  }
+
+  document.getElementsByClassName("sidebar")[0].style.transition = 'all 2s'
+  document.getElementsByClassName("sidebar")[0].classList.add('hide')
+  document.getElementsByClassName('header')[0].style.width = '100%'
+  document.getElementsByClassName('map-area')[0].style.width = '100%'
+  document.getElementById('map').style.width = '100%'
+  this.resizeMap()
+}
+
+//set Light Theme
+lightTheme = () => {
+  this.state.map.setOptions({styles: lightTheme})
+}
+
+//set Dark Theme
+darkTheme = () => {
+  this.state.map.setOptions({styles: darkTheme})
+}
 
   //TODO:Enable service worker + offline first
-
+  //TODO:Responsive design
+  //TODO:Sidebar color gradient
+  //TODO:transition for closing/opening sidebar
   //TODO:Enable Focus (tabbing)
-  //TODO:Site elements are defined semantically (ARIA)
-  //TODO:Responsive design and styling overhaul
 
   render() {
     return (
       <div>
-        <div className='sidebar'>
+        <div className='sidebar' id='mySidebar'>
+          <div className='close-button-container' onClick={this.hideSidebar}>
+            <i className="fas fa-window-close"></i>
+          </div>
           <div className='filter'>
             <input
               id='places-button'
@@ -410,6 +466,20 @@ createWindow = (name, info) => {
             />)
             }
           </div>
+          <div className='theme-options'>
+            <div className='theme-button-container'>
+              <button
+                className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                onClick={this.darkTheme}>
+                Dark
+              </button>
+              <button
+                className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                onClick={this.lightTheme}>
+                Light
+              </button>
+             </div>
+          </div>
           <div className='powered-by-container'>
             <p>Powered By:</p>
             <div className='google-logo'>
@@ -425,7 +495,8 @@ createWindow = (name, info) => {
           getPlaces={this.getPlaces}
           findCenter={this.findCenter}
           map={this.state.map}
-          setMap={this.setMap}/>
+          setMap={this.setMap}
+          resizeMap={this.resizeMap}/>
       </div>
     )
   }

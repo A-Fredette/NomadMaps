@@ -1,10 +1,12 @@
 /* eslint-disable no-undef */
 /* global google */
 import React, { Component } from 'react'
+import Script from 'react-load-script'
 
 const mapStyle = {
-  width: '80vw',
-  height: '100vh'
+  width: '100%',
+  height: '100vh',
+  position: 'inherit'
 }
 
 let map
@@ -14,24 +16,42 @@ const darkTheme =  [
   {"featureType": "road.highway","elementType": "labels.text.stroke","stylers": [{"visibility": "off"}]},{"featureType": "road.highway","elementType": "labels.icon","stylers": [{"visibility": "on"}]}
 ]
 
-const lightTheme = [
-  {"featureType": "water","stylers": [{"color": "#19a0d8"}]}, {"featureType": "administrative","elementType": "labels.text.stroke","stylers": [{"color": "#ffffff"}, {"weight": 6}]}, {"featureType": "administrative","elementType": "labels.text.fill","stylers": [{"color": "#e85113"}]}, {"featureType": "road.highway","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -40}]}, {"featureType": "road.arterial","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -20}]},{"featureType": "road","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "road","elementType": "labels.text.fill","stylers": [{"lightness": -100}]},
-  {"featureType": "road.highway","elementType": "labels.icon"}, {"featureType": "landscape","elementType": "labels","stylers": [{"visibility": "off"}]}, {"featureType": "landscape","stylers": [{"lightness": 20}, {"color": "#efe9e4"}]}, {"featureType": "landscape.man_made","stylers": [{"visibility": "off"}]}, {"featureType": "water","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "water","elementType": "labels.text.fill","stylers": [{"lightness": -100}]}, {"featureType": "poi","elementType": "labels.text.fill","stylers": [{"hue": "#11ff00"}]}, {"featureType": "poi","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "poi","elementType": "labels.icon","stylers": [{"hue": "#4cff00"}, {"saturation": 58}]}, {"featureType": "poi","elementType": "geometry","stylers": [{"visibility": "on"}, {"color": "#f0e4d3"}]}, {"featureType": "road.highway","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -25}]}, {"featureType": "road.arterial","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -10}]}, {"featureType": "poi","elementType": "labels","stylers": [{"visibility": "simplified"}]}]
-
 class Map extends Component {
   state = {
+    mapStatus: 'not called',
     map: {},
     address: ''
   }
 
+  //updated state to refect Google API called (for conditional rendering)
+  googleCalled = () => {
+    this.setState({mapStatus: 'called'})
+  }
+
+  //error notification if Google API cannot be loaded
+  handleError = () => {
+    window.alert('There was a problem connecting to Google. Please try again later.')
+  }
+
   //creates and draws the initial map and stores it in this.props.map (app.js)
-  componentDidMount = () => {
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 15,
-        center: {lat: 52.5200, lng: 13.4050}
+  loadGoogleMap = () => {
+    return new Promise((resolve, reject) => {
+      map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 14,
+          center: {lat: 52.5200, lng: 13.4050},
+          mapTypeControl: false,
+          styles: darkTheme
+      })
+      resolve(map)
     })
-    this.props.setMap(map)
-   }
+  .then(map => {
+  this.props.setMap(map)}) //sets map in App state for access by other components
+  .catch(error => {
+    window.alert('There was a problem connecting to Google. Please try again later.')
+  })
+
+  this.setState({mapStatus: 'loaded'}) //for conditional rendering
+  }
 
   //updates state address with address or search result
   updateAddress = (address) => {
@@ -44,25 +64,45 @@ class Map extends Component {
     this.props.findCenter(this.state.address)
   }
 
-  lightTheme = () => {
-    this.props.map.setOptions({styles: lightTheme})
+  openSidebar = () => {
+    const width = window.innerWidth
+    if (width < 1005) {
+      document.getElementsByClassName('header')[0].style.left = '220px'
+    }
+
+    if (width < 650) {
+      document.getElementsByClassName('location-search ')[0].style.add('hide')
+    }
+
+    //document.getElementsByClassName("sidebar")[0].style.transition = "all 2s"
+    document.getElementsByClassName("sidebar")[0].classList.remove('hide')
+    document.getElementsByClassName('header')[0].style.width = '80%'
+    document.getElementsByClassName('map-area')[0].style.width = '80%'
+    this.props.resizeMap()
   }
 
-  darkTheme = () => {
-    this.props.map.setOptions({styles: darkTheme})
-  }
-
+   //react-load-script (https://www.npmjs.com/package/react-load-script) used for loading Google maps to avoid life cycle conflicts
    render() {
      return (
-       <div className='map-area'>
+     <div className='map-area'>
+       <Script
+        url="https://maps.googleapis.com/maps/api/js?libraries=places,geometry&key=AIzaSyCnk13B0GvH152PBNcvAyJRURzQyCgDInk&v=3"
+        onCreate={this.googleCalled.bind(this)}
+        onError={this.handleError.bind(this)}
+        onLoad={this.loadGoogleMap.bind(this)}
+        />
+       <div>
          <div className='header'>
+             <div className='hamburger-container' onClick={this.openSidebar}>
+               <i className="fas fa-bars"></i>
+             </div>
            <div className='search-bar'>
             <form className='location-search' onSubmit={this.goToLocation}>
               <div className="mdl-textfield mdl-js-textfield">
                 <input
                   type='text'
                   placeholder='Where to, Nomad?'
-                  className='mdl-textfield__input location-search'
+                  className='search mdl-textfield__input location-search'
                   value={this.state.address}
                   onChange={(e) => this.updateAddress(e.target.value)}/>
                   <label
@@ -71,31 +111,24 @@ class Map extends Component {
                   </label>
                   <div className='search-button'>
                    <input
-                      id='go-to-button'
-                      type='submit'
-                      className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                      value='Search'/>
+                    id='go-to-button'
+                    type='submit'
+                    className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                    value='Search'/>
                 </div>
              </div>
            </form>
          </div>
-         <div className='theme-options'>
-           <div className='theme-button-container'>
-             <button
-               className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-               onClick={this.darkTheme}>
-               Dark
-             </button>
-             <button
-               className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-               onClick={this.lightTheme}>
-               Light
-             </button>
-            </div>
+         <div id='map' style={mapStyle}>
+           {this.state.mapStatus !== 'loaded' ? (
+             <h5 className='loading-map'>Loading Map...</h5>
+           ) : (
+             <div></div>
+           )}
          </div>
        </div>
-         <div id='map' style={mapStyle}></div>
-       </div>
+     </div>
+   </div>
      )
    }
 }

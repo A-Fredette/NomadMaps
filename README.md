@@ -10,10 +10,10 @@ If you would like to download the app:
 This should automatically launch a development server. If it does not, the app can be accessed at http://localhost:3000/ from your web browser.
 
 ## Summary
-The purpose of this app is to help nomads quickly become familiar with an area by quickly identifying all of the places that the user might be interested in.
+The purpose of this app is to help nomads quickly become familiar with an area by quickly identifying all of the places that the user might be interested in. Read the guidelines below for instructions on how to use the app.
 
 ### Interest View
-The app opens in 'interest view,' and initializes with three interests: Co Workings, Coffee Shops, and Gyms. 20 locations for each interest, ranked by Google prominence, will be marked on the map. Each marker will automatically get it's own distinct color, with a maximum of five interests. Interests can be removed by clicking on the minus icon. When a new interest is added, call down it's markers by clicking on the map marker icon. The 'Remove All Markers' button will remove all markers from the map and any associated places from the list view. After removing all markers, the marker icon next to each interest can be used to recreate markers for places that most closely match that interest.
+The app opens in 'interest view,' and initializes with three interests: Co Workings, Coffee Shops, and Gyms. 20 locations for each interest, ranked by Google prominence, will be marked on the map. Each marker will automatically get it's own distinct color, with a maximum of five interests. Interests can be removed by clicking on the minus icon. When a new interest is added, call down it's markers by clicking on the map marker icon. The 'Remove All Markers' button will remove all markers from the map and any associated places from the list view. After removing all markers, the marker icon next to each interest can be used to recreate markers for places that most closely match that interest. Please note that there can be difficulty getting places if the place's name uses characters that are not in the English alphabet (eg., Chinese Characters)
 
 ### List View
 For each marker on the map, the name of the location will also be displayed in the 'List View,' accessed by clicking on the 'List' button. Deleting an interest will also remove the places associated with it from the list view. Click on the name of a place will open an InfoWindow above the marker for that place. Clicking on the name a second time will close that InfoWindow.
@@ -31,5 +31,6 @@ Material Designs
 Font Awesome
 Google Map & Places API
 Foursquare API
+
 
 This project was developed as part of the requirements for Udactiy's Front End Nanodegree. It is intended to demonstrate a proficiency with React, javascript, responsive web design, ARIA / accessibility, offline-first development, asynchronous functions and use of third party APIs.

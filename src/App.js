@@ -473,9 +473,6 @@ darkTheme = () => {
   this.state.map.setOptions({styles: darkTheme})
 }
 
-  //TODO:Enable service worker + offline first
-  //TODO:Responsive design
-
   render() {
     return (
       <div>

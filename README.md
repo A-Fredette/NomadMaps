@@ -25,7 +25,7 @@ There is a search bar at the top of the map that can be used to center the map. 
 Pull requests and contributions to this repository are welcomed.
 
 ## Notes
-####This project makes use of the following libraries:
+This project makes use of the following libraries:
 React [Create React App](https://github.com/facebookincubator/create-react-app).
 Material Designs
 Font Awesome

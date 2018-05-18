@@ -45,13 +45,15 @@ class Map extends Component {
       resolve(map)
     })
   .then(map => {
-  this.props.setMap(map)}) //sets map in App state for access by other components
+    this.props.setMap(map) //sets map in App state for access by other components
+    for (const each in this.props.interests) { //sets markers for interests that are set in the initial interests state
+      this.props.getPlaces(this.props.interests[each])
+      }})
   .catch(error => {
     window.alert('There was a problem connecting to Google. Please try again later.')
-  })
+  })}
 
-  this.setState({mapStatus: 'loaded'}) //for conditional rendering
-  }
+
 
   //updates state address with address or search result
   updateAddress = (address) => {
@@ -65,20 +67,31 @@ class Map extends Component {
   }
 
   openSidebar = () => {
-    const width = window.innerWidth
-    if (width < 1005) {
-      document.getElementsByClassName('header')[0].style.left = '220px'
-    }
+    if (this.props.sidebar === 'closed') {
+      const width = window.innerWidth
 
-    if (width < 650) {
-      document.getElementsByClassName('location-search ')[0].style.add('hide')
-    }
+      if (width < 1135) {
+        document.getElementsByClassName('hamburger-container')[0].style.left = '230px'
+      }
 
-    //document.getElementsByClassName("sidebar")[0].style.transition = "all 2s"
-    document.getElementsByClassName("sidebar")[0].classList.remove('hide')
-    document.getElementsByClassName('header')[0].style.width = '80%'
-    document.getElementsByClassName('map-area')[0].style.width = '80%'
-    this.props.resizeMap()
+      if (width < 1005) {
+        document.getElementsByClassName('header')[0].style.left = '220px'
+      }
+
+      if (width < 650) {
+        document.getElementsByClassName('location-search')[0].classList.add('hide')
+        console.log(document.getElementsByClassName('location-search')[0])
+      }
+
+      //TODO: Add transition for sidebar opening and closing
+      //document.getElementsByClassName("sidebar")[0].style.transition = "all 2s"
+      //document.getElementsByClassName('hamburger-container')[0].classList.add('hide')
+      document.getElementsByClassName("sidebar")[0].classList.remove('hide')
+      document.getElementsByClassName('header')[0].style.width = '80%'
+      document.getElementsByClassName('map-area')[0].style.width = '80%'
+      this.props.resizeMap()
+      this.props.toggle()
+    }
   }
 
    //react-load-script (https://www.npmjs.com/package/react-load-script) used for loading Google maps to avoid life cycle conflicts
@@ -94,7 +107,7 @@ class Map extends Component {
        <div>
          <div className='header'>
              <div className='hamburger-container' onClick={this.openSidebar}>
-               <i className="fas fa-bars"></i>
+               <i className="fas fa-bars" tabIndex={1}></i>
              </div>
            <div className='search-bar'>
             <form className='location-search' onSubmit={this.goToLocation}>

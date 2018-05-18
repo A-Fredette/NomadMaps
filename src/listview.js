@@ -81,7 +81,7 @@ class ListView extends Component {
                   <div className='interest-header' role='Heading'><h6>{place.interest}</h6></div>
                   <hr></hr>
                   {place.locations.map((place) =>(
-                    <li key={place.id} id={place.id} onClick={(e) => this.clickMarker(e.target)}>{place.name}</li>
+                    <li key={place.id} id={place.id} tabIndex={place.tabIndex} onClick={(e) => this.clickMarker(e.target)}>{place.name}</li>
                   ))}
                 </div>
               ))
@@ -95,7 +95,7 @@ class ListView extends Component {
                   <div className='interest-header' role='Heading'><h6>{place.interest}</h6></div>
                   <hr></hr>
                   {place.locations.map((place) =>(
-                    <li key={place.id} id={place.id} onClick={(e) => this.clickMarker(e.target)}>{place.name}</li>
+                    <li key={place.id} id={place.id} tabIndex={place.tabIndex} onClick={(e) => this.clickMarker(e.target)}>{place.name}</li>
                   ))}
                 </div>
               ))

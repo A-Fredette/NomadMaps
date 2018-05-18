@@ -62,7 +62,7 @@ delete = (interest) => {
                 <i className="fas fa-map-marker" role='Button'></i>
               </button>
             </div>
-              <div className="interest">{interest.interest}</div>
+              <div className="interest" tabIndex={interest.tabIndex}>{interest.interest}</div>
             <hr className='bottom-hr'></hr>
             </li>
           </div>

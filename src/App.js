@@ -26,9 +26,12 @@ const lightTheme = [
   {"featureType": "water","stylers": [{"color": "#19a0d8"}]}, {"featureType": "administrative","elementType": "labels.text.stroke","stylers": [{"color": "#ffffff"}, {"weight": 6}]}, {"featureType": "administrative","elementType": "labels.text.fill","stylers": [{"color": "#e85113"}]}, {"featureType": "road.highway","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -40}]}, {"featureType": "road.arterial","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -20}]},{"featureType": "road","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "road","elementType": "labels.text.fill","stylers": [{"lightness": -100}]},
   {"featureType": "road.highway","elementType": "labels.icon"}, {"featureType": "landscape","elementType": "labels","stylers": [{"visibility": "off"}]}, {"featureType": "landscape","stylers": [{"lightness": 20}, {"color": "#efe9e4"}]}, {"featureType": "landscape.man_made","stylers": [{"visibility": "off"}]}, {"featureType": "water","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "water","elementType": "labels.text.fill","stylers": [{"lightness": -100}]}, {"featureType": "poi","elementType": "labels.text.fill","stylers": [{"hue": "#11ff00"}]}, {"featureType": "poi","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "poi","elementType": "labels.icon","stylers": [{"hue": "#4cff00"}, {"saturation": 58}]}, {"featureType": "poi","elementType": "geometry","stylers": [{"visibility": "on"}, {"color": "#f0e4d3"}]}, {"featureType": "road.highway","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -25}]}, {"featureType": "road.arterial","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -10}]}, {"featureType": "poi","elementType": "labels","stylers": [{"visibility": "simplified"}]}]
 
+let placesTabIndex = 20
+
 class App extends Component {
   state = {
     view: 'places',
+    sidebarVis: 'open',
     map: '',
     markers:[],
     mapCenter: {
@@ -41,39 +44,58 @@ class App extends Component {
       interest: 'Co Working',
       color: colors.green,
       css: {color: '#58f958'},
-      calls: 0
+      calls: 0,
+      tabIndex: 1
       },
       {
       id: '092203d0-2d1f-4000-9838-7171c21dfa72',
       interest: 'Coffee Shops',
       color: colors.red,
       css: {color: '#f06b6b'},
-      calls: 0
+      calls: 0,
+      tabIndex: 2
       },
       {
       id: '4bda6a6f-8180-47c4-9396-2eb8a96c58de',
       interest: 'Gyms',
       color: colors.blue,
       css: {color: '#778ee1'},
-      calls: 0
+      calls: 0,
+      tabIndex: 3
     }
     ],
     places: []
   }
 
-  //sets markers for interests that are set in the initial interests state
   componentDidMount = () => {
-    setTimeout(() => {
-      for (const each in this.state.interests) {
-        this.getPlaces(this.state.interests[each])
+    let sidebar = this.state.sidebarVis
+    document.addEventListener("DOMContentLoaded", function(event) {
+      const width = window.innerWidth
+
+      if (width < 650 && sidebar === 'open') {
+        document.getElementsByClassName('location-search')[0].classList.add('hide')
       }
-    }, 2000)
+    })
 
-    //event listener for window resizing
-
+    //event listener for responsive design
     window.onresize = () => {
       this.resizeMap()
+
+      let width = window.innerWidth
+      if (width < 650 && this.state.sidebarVis === 'open') {
+        document.getElementsByClassName('location-search')[0].classList.add('hide')
+        this.toggleSidebar()
+      }
+      if (width > 650) {
+        document.getElementsByClassName('location-search')[0].classList.remove('hide')
+        this.toggleSidebar()
+      }
     }
+  }
+
+  //helper method for setting App.js state in components
+  componentSetState = (state, value) => {
+    this.setState({state: value})
   }
 
   //resize the map according to the window size
@@ -94,6 +116,18 @@ class App extends Component {
     })
   }
 
+  //toggle the sidebar state status
+  toggleSidebar = () => {
+    if (this.state.sidebarVis === 'open') {
+      this.setState({sidebarVis: 'closed'})
+    }
+
+    if (this.state.sidebarVis === 'closed') {
+      this.setState({sidebarVis: 'open'})
+    }
+    console.log(this.state.sidebarVis)
+  }
+
   //updates interests based on query entry (controlled in places.js)
   updateInterest = (query) => {
     let newInterest = {
@@ -105,36 +139,42 @@ class App extends Component {
       case 1:
         newInterest.color = colors.green
         newInterest.css = {color: '#58f958'}
+        newInterest.tabindex = 2
         colors.state = 2
         break
 
       case 2:
         newInterest.color = colors.red
         newInterest.css = {color: '#f06b6b'}
+        newInterest.tabindex = 3
         colors.state = 3
         break
 
       case 3:
         newInterest.color = colors.blue
         newInterest.css = {color: '#778ee1'}
+        newInterest.tabindex = 4
         colors.state = 4
         break
 
       case 4:
         newInterest.color = colors.purple
         newInterest.css = {color: '#c973e7'}
+        newInterest.tabindex = 5
         colors.state = 5
         break
 
       case 5:
         newInterest.color = colors.yellow
         newInterest.css = {color: '#e8ea66'}
+        newInterest.tabindex = 6
         colors.state = 1
         break
 
       default:
         newInterest.color = colors.red
         newInterest.css = {color: '#f06b6b'}
+        newInterest.tabindex = 3
         colors.state = 3
         break
     }
@@ -144,6 +184,7 @@ class App extends Component {
   //removes places associated with deleted interests from this.state.places
   removePlaces = (deletedInterest) => {
     let filteredPlaces = this.state.places.filter(place => place.interest !== deletedInterest)
+    placesTabIndex = 20
     this.setState({places: filteredPlaces})
   }
 
@@ -201,6 +242,10 @@ class App extends Component {
 
   //add places to state
   addPlaces = (interest, response) => {
+    for (const place in response) {
+      response[place].tabIndex = placesTabIndex
+      placesTabIndex ++
+    }
     this.setState({places: this.state.places.concat({interest: interest.interest, locations: response})})
   }
 
@@ -252,8 +297,8 @@ class App extends Component {
             this.foursquareInfo(response[place], interest) //get place info, create Google InfoWindow and Markers
           }
         } else {
-          console.log('Places text search failed ', status)
-          window.alert('No results')
+          console.log('Places text search failed: ', status)
+          window.alert('No results.')
         }
       }))
       interest.calls = 1
@@ -280,8 +325,7 @@ class App extends Component {
           resolve(info)
         }
       }).catch(error => console.log(error))
-    })
-  }
+    })}
 
   //async function for getting Foursquare photos of a venue
   getPhotos = (info) => {
@@ -302,8 +346,7 @@ class App extends Component {
         resolve(info)
     }).catch(error => console.log(error))
     }
-  })
-}
+  })}
 
 //async function for getting the Foursquare hours of a location
 getHours = (info) => {
@@ -394,21 +437,30 @@ createWindow = (name, info) => {
 
 //when triggered (click), hide the side bar and expand the map and header areas
 hideSidebar = () => {
-  const width = window.innerWidth
-  if (width < 1005) {
-    document.getElementsByClassName('header')[0].style.left = '3%'
-  }
+  if (this.state.sidebarVis === 'open') {
+    const width = window.innerWidth
 
-  if (width < 650) {
-    document.getElementsByClassName('location-search ')[0].style.remove('hide')
-  }
+    if (width < 1135) {
+      document.getElementsByClassName('hamburger-container')[0].style.left = '20px'
+    }
 
-  document.getElementsByClassName("sidebar")[0].style.transition = 'all 2s'
-  document.getElementsByClassName("sidebar")[0].classList.add('hide')
-  document.getElementsByClassName('header')[0].style.width = '100%'
-  document.getElementsByClassName('map-area')[0].style.width = '100%'
-  document.getElementById('map').style.width = '100%'
-  this.resizeMap()
+    if (width < 1005) {
+      document.getElementsByClassName('header')[0].style.left = '3%'
+    }
+
+    if (width < 650) {
+      document.getElementsByClassName('location-search')[0].classList.remove('hide')
+      this.setState({sidebarVis: 'closed'})
+    }
+
+    document.getElementsByClassName("sidebar")[0].style.transition = 'all 2s'
+    document.getElementsByClassName("sidebar")[0].classList.add('hide')
+    document.getElementsByClassName('header')[0].style.width = '100%'
+    document.getElementsByClassName('map-area')[0].style.width = '100%'
+    document.getElementById('map').style.width = '100%'
+    this.resizeMap()
+    this.toggleSidebar()
+  }
 }
 
 //set Light Theme
@@ -423,16 +475,13 @@ darkTheme = () => {
 
   //TODO:Enable service worker + offline first
   //TODO:Responsive design
-  //TODO:Sidebar color gradient
-  //TODO:transition for closing/opening sidebar
-  //TODO:Enable Focus (tabbing)
 
   render() {
     return (
       <div>
         <div className='sidebar' id='mySidebar'>
           <div className='close-button-container' onClick={this.hideSidebar}>
-            <i className="fas fa-window-close"></i>
+            <i className="fas fa-window-close mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></i>
           </div>
           <div className='filter'>
             <input
@@ -496,7 +545,9 @@ darkTheme = () => {
           findCenter={this.findCenter}
           map={this.state.map}
           setMap={this.setMap}
-          resizeMap={this.resizeMap}/>
+          resizeMap={this.resizeMap}
+          sidebar={this.state.sidebarVis}
+          toggle={this.toggleSidebar}/>
       </div>
     )
   }

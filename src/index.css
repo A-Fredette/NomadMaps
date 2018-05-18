@@ -5,6 +5,11 @@ body {
 }
 
 /* --SIDEBAR-- */
+
+.fa-window-close.fa-w-16.mdl-button {
+  width: 20px;
+}
+
 #autocomplete {
   box-shadow: 0 0px 0px 0 rgba(0,0,0,.14), 0 1px 1px -1px rgba(0,0,0,.2), 0 0px 1px 0 rgba(0,0,0,.12);
   height: 29px;
@@ -48,8 +53,9 @@ body {
   font-family: "Helvetica","Arial",sans-serif;
   font-weight: 500;
   letter-spacing: .03em;
-  color: rgb(106, 187, 249);
+  color: rgb(9, 0, 0);
   margin-top: 2px;
+  font-weight: bold;
 }
 
 .interest-list li:hover {
@@ -67,11 +73,14 @@ body {
 .interest {
   font-family: "Helvetica","Arial",sans-serif;
   font-weight: bold;
-  color: rgb(198, 198, 198);
+  color: rgb(9, 0, 0);
 }
 
 .sidebar {
-  background-color: rgb(56, 56, 56);
+  background: #636363;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(#FFF, #636363 35%, #fff);
+  background: -o-linear-gradient(#ffffff, #636363 35%, #fff);
+  background: linear-gradient(#fff, #636363 35%, #a19a9a);  /* Chrome 10-25, Safari 5.1-6 */ /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   min-width: 220px;
   width: 20%;
   height: 100vh;
@@ -95,7 +104,7 @@ body {
 }
 
 .hide {
-  display: none;
+  display: none !important;
 }
 
 .location-search {
@@ -106,6 +115,54 @@ body {
   top: 10px;
   left: 22%;
 }
+
+@media only screen and (max-width : 735px) {
+  .search {
+    width: 50%;
+  }
+}
+
+@media only screen and (max-width : 680px) {
+  .search {
+    margin-left: -10px;
+    width: 50%;
+  }
+}
+
+@media only screen and (max-width : 680px) and (min-width : 461px) {
+  .location-search {
+    left: 15%;
+  }
+}
+
+@media only screen and (max-width : 460px) {
+  .location-search {
+    left: 12%;
+    padding-left: 88px;
+  }
+  .search-bar {
+    width: 0 !important;
+  }
+  .search {
+    width: 50% !important;
+  }
+}
+
+@media only screen and (max-width : 410px) {
+  .location-search {
+    left: 10%;
+  }
+}
+
+@media only screen and (max-width : 340px) {
+  .search-button {
+    margin: 20px 0 0 -15px !important;
+  }
+  .search {
+    margin-left: -43px !important;
+  }
+}
+
 
 .location-search div {
   padding-bottom: 0;
@@ -169,16 +226,6 @@ body {
   height: 27px !important;
 }
 
-@media only screen and (max-width : 755px) {
-  .search {
-    margin-left: -66px;
-    width: 50%;
-  }
-  .location-search {
-    padding-left: 200px;
-  }
-}
-
 .search-button {
   margin: 20px 0 0 24px;
   width: auto;
@@ -208,7 +255,7 @@ body {
   margin: 20px 0 0 20px;
   display: inline-block;
   position: absolute;
-  z-index: 1;
+  z-index: 10;
 }
 
 @media only screen and (max-width : 1135px) {
@@ -234,6 +281,7 @@ body {
   display: block;
   height: 25px;
   margin: 5px 10px 0 0;
+  z-index: 12;
 }
 
 .fa-bars:hover,

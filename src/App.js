@@ -2,7 +2,7 @@
 /* global google */
 import React, { Component } from 'react'
 import Map from './map.js'
-import Places from './places.js'
+import Interests from './interests.js'
 import ListView from './listview.js'
 import 'whatwg-fetch' //polyfill for fetch
 import './App.css'
@@ -16,9 +16,22 @@ const colors = {
   state: 4
 }
 
+const darkTheme =  [
+  {"featureType": "all","elementType": "all","stylers": [{"invert_lightness": true},{"saturation": "-9"},{"lightness": "0"},{"visibility": "simplified"}]},{"featureType": "landscape.man_made","elementType": "all","stylers": [{"weight": "1.00"}]},{"featureType": "road.highway","elementType": "all","stylers": [{"weight": "0.49"}]},
+  {"featureType": "road.highway","elementType": "labels","stylers": [{"visibility": "on"},{"weight": "0.01"},{"lightness": "-7"},{"saturation": "-35"}]},{"featureType": "road.highway","elementType": "labels.text","stylers": [{"visibility": "on"}]},
+  {"featureType": "road.highway","elementType": "labels.text.stroke","stylers": [{"visibility": "off"}]},{"featureType": "road.highway","elementType": "labels.icon","stylers": [{"visibility": "on"}]}
+]
+
+const lightTheme = [
+  {"featureType": "water","stylers": [{"color": "#19a0d8"}]}, {"featureType": "administrative","elementType": "labels.text.stroke","stylers": [{"color": "#ffffff"}, {"weight": 6}]}, {"featureType": "administrative","elementType": "labels.text.fill","stylers": [{"color": "#e85113"}]}, {"featureType": "road.highway","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -40}]}, {"featureType": "road.arterial","elementType": "geometry.stroke","stylers": [{"color": "#efe9e4"}, {"lightness": -20}]},{"featureType": "road","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "road","elementType": "labels.text.fill","stylers": [{"lightness": -100}]},
+  {"featureType": "road.highway","elementType": "labels.icon"}, {"featureType": "landscape","elementType": "labels","stylers": [{"visibility": "off"}]}, {"featureType": "landscape","stylers": [{"lightness": 20}, {"color": "#efe9e4"}]}, {"featureType": "landscape.man_made","stylers": [{"visibility": "off"}]}, {"featureType": "water","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "water","elementType": "labels.text.fill","stylers": [{"lightness": -100}]}, {"featureType": "poi","elementType": "labels.text.fill","stylers": [{"hue": "#11ff00"}]}, {"featureType": "poi","elementType": "labels.text.stroke","stylers": [{"lightness": 100}]}, {"featureType": "poi","elementType": "labels.icon","stylers": [{"hue": "#4cff00"}, {"saturation": 58}]}, {"featureType": "poi","elementType": "geometry","stylers": [{"visibility": "on"}, {"color": "#f0e4d3"}]}, {"featureType": "road.highway","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -25}]}, {"featureType": "road.arterial","elementType": "geometry.fill","stylers": [{"color": "#efe9e4"}, {"lightness": -10}]}, {"featureType": "poi","elementType": "labels","stylers": [{"visibility": "simplified"}]}]
+
+let placesTabIndex = 20
+
 class App extends Component {
   state = {
     view: 'places',
+    sidebarVis: 'open',
     map: '',
     markers:[],
     mapCenter: {
@@ -28,36 +41,69 @@ class App extends Component {
     interests: [
       {
       id: '8292a3f9-598a-4f51-b964-424f466e31d0',
-      interest: 'Co Working Spaces',
+      interest: 'Co Working',
       color: colors.green,
       css: {color: '#58f958'},
-      calls: 0
+      calls: 0,
+      tabIndex: 1
       },
       {
       id: '092203d0-2d1f-4000-9838-7171c21dfa72',
       interest: 'Coffee Shops',
       color: colors.red,
       css: {color: '#f06b6b'},
-      calls: 0
+      calls: 0,
+      tabIndex: 2
       },
       {
       id: '4bda6a6f-8180-47c4-9396-2eb8a96c58de',
       interest: 'Gyms',
       color: colors.blue,
       css: {color: '#778ee1'},
-      calls: 0
+      calls: 0,
+      tabIndex: 3
     }
     ],
     places: []
   }
 
-  //sets markers for interests that are set in the initial interests state
   componentDidMount = () => {
-    setTimeout(() => {
-      for (const each in this.state.interests) {
-        this.getPlaces(this.state.interests[each])
+    let sidebar = this.state.sidebarVis
+    document.addEventListener("DOMContentLoaded", function(event) {
+      const width = window.innerWidth
+
+      if (width < 650 && sidebar === 'open') {
+        document.getElementsByClassName('location-search')[0].classList.add('hide')
       }
-    }, 2000)
+    })
+
+    //event listener for responsive design
+    window.onresize = () => {
+      this.resizeMap()
+
+      let width = window.innerWidth
+      if (width < 650 && this.state.sidebarVis === 'open') {
+        document.getElementsByClassName('location-search')[0].classList.add('hide')
+        this.toggleSidebar()
+      }
+      if (width > 650) {
+        document.getElementsByClassName('location-search')[0].classList.remove('hide')
+        this.toggleSidebar()
+      }
+    }
+  }
+
+  //helper method for setting App.js state in components
+  componentSetState = (state, value) => {
+    this.setState({state: value})
+  }
+
+  //resize the map according to the window size
+  //source: https://codepen.io/alexgill/pen/NqjMma
+  resizeMap = () => {
+    let center = this.state.map.getCenter()
+    google.maps.event.trigger(this.state.map, 'resize')
+    this.state.map.setCenter(center)
   }
 
   //utility function for creating a GUID
@@ -68,6 +114,18 @@ class App extends Component {
           v = c === 'x' ? r : (r&0x3|0x8)
         return v.toString(16)
     })
+  }
+
+  //toggle the sidebar state status
+  toggleSidebar = () => {
+    if (this.state.sidebarVis === 'open') {
+      this.setState({sidebarVis: 'closed'})
+    }
+
+    if (this.state.sidebarVis === 'closed') {
+      this.setState({sidebarVis: 'open'})
+    }
+    console.log(this.state.sidebarVis)
   }
 
   //updates interests based on query entry (controlled in places.js)
@@ -81,36 +139,42 @@ class App extends Component {
       case 1:
         newInterest.color = colors.green
         newInterest.css = {color: '#58f958'}
+        newInterest.tabindex = 2
         colors.state = 2
         break
 
       case 2:
         newInterest.color = colors.red
         newInterest.css = {color: '#f06b6b'}
+        newInterest.tabindex = 3
         colors.state = 3
         break
 
       case 3:
         newInterest.color = colors.blue
         newInterest.css = {color: '#778ee1'}
+        newInterest.tabindex = 4
         colors.state = 4
         break
 
       case 4:
         newInterest.color = colors.purple
         newInterest.css = {color: '#c973e7'}
+        newInterest.tabindex = 5
         colors.state = 5
         break
 
       case 5:
         newInterest.color = colors.yellow
         newInterest.css = {color: '#e8ea66'}
+        newInterest.tabindex = 6
         colors.state = 1
         break
 
       default:
         newInterest.color = colors.red
         newInterest.css = {color: '#f06b6b'}
+        newInterest.tabindex = 3
         colors.state = 3
         break
     }
@@ -120,6 +184,7 @@ class App extends Component {
   //removes places associated with deleted interests from this.state.places
   removePlaces = (deletedInterest) => {
     let filteredPlaces = this.state.places.filter(place => place.interest !== deletedInterest)
+    placesTabIndex = 20
     this.setState({places: filteredPlaces})
   }
 
@@ -151,7 +216,6 @@ class App extends Component {
 
   //removes all markers from the map, resets marker calls and removes all places
   removeMarkers = () => {
-    let updatedInterests = this.state.interests
     for (let marker in this.state.markers) {
       this.state.markers[marker].setMap(null)
     }
@@ -178,12 +242,17 @@ class App extends Component {
 
   //add places to state
   addPlaces = (interest, response) => {
+    for (const place in response) {
+      response[place].tabIndex = placesTabIndex
+      placesTabIndex ++
+    }
     this.setState({places: this.state.places.concat({interest: interest.interest, locations: response})})
   }
 
   //Finds the lat/lng coordinates of an address or location string
   findCenter = (address) => {
     let geocoder = new google.maps.Geocoder()
+    this.removeMarkers()
     geocoder.geocode({address: address}, ((response, status) => {
       if (status === 'OK') {
         let lat = response[0].geometry.location.lat()
@@ -220,17 +289,16 @@ class App extends Component {
       let service = new google.maps.places.PlacesService(this.state.map)
       service.textSearch( //must provide location to return results
         {query: targetInterest,
-        rankby: prominence, //ranks by prominence of location. remove line if buggy.
         location: {lat: this.state.mapCenter.lat, lng: this.state.mapCenter.lng},
-        radius: '300'}, ((response, status) => {
+        radius: '1'}, ((response, status) => {
         if (status === 'OK') {
           this.addPlaces(interest, response) //add places to state
           for (let place in response){
             this.foursquareInfo(response[place], interest) //get place info, create Google InfoWindow and Markers
           }
         } else {
-          console.log('Places text search failed ', status)
-          window.alert('No results')
+          console.log('Places text search failed: ', status)
+          window.alert('No results.')
         }
       }))
       interest.calls = 1
@@ -257,8 +325,7 @@ class App extends Component {
           resolve(info)
         }
       }).catch(error => console.log(error))
-    })
-  }
+    })}
 
   //async function for getting Foursquare photos of a venue
   getPhotos = (info) => {
@@ -279,8 +346,7 @@ class App extends Component {
         resolve(info)
     }).catch(error => console.log(error))
     }
-  })
-}
+  })}
 
 //async function for getting the Foursquare hours of a location
 getHours = (info) => {
@@ -352,16 +418,16 @@ createMarker = (lat, lng, name, id, interest, infowindow) => {
 
 //create a google infowindow, populated by info from Foursquare API
 createWindow = (name, info) => {
-  let photoHTML = (info.photoURL !== 'Kein Foto') ? `<img src=${info.photoURL} alt=${name+' image'}></img>` : '<h4>No Photos Available</h4>'
-  let hoursHTML = (info.hours !== 'Hours Not Available') ? `<p className='hours-text'>${info.hours.start} to ${info.hours.end}</p>` : `<p className='hours-text'>Hours Not Available</p>`
-  let linkHTML = (info.link) ? `<a href=${info.link}><h4 className='name'>${name}</a>` : `<h4 className='name'>${name}</h4>`
+  let photoHTML = (info.photoURL !== 'Kein Foto') ? `<img src=${info.photoURL} alt=${name+' image'}></img>` : '<h6>No Photos Available</h6>'
+  let hoursHTML = (info.hours !== 'Hours Not Available') ? `<p class='hours-text'>Open Today: ${info.hours.start} to ${info.hours.end}</p>` : `<p class='hours-text'>Hours Not Available</p>`
+  let linkHTML = (info.link) ? `<a href=${info.link}><h6 class='name'>${name}</h6></a>` : `<h6 class='name'>${name}</h6>`
   const infowindow = new google.maps.InfoWindow({
-    content: `<div className='infowindow-div'>
+    content: `<div class='infowindow-div'>
         ${linkHTML}
-        <div className='picture-container'>
+        <div class='picture-container'>
           ${photoHTML}
         </div>
-        <div className='hours'>
+        <div class='hours'>
           ${hoursHTML}
         </div>
       </div>`
@@ -369,17 +435,54 @@ createWindow = (name, info) => {
   return infowindow
 }
 
+//when triggered (click), hide the side bar and expand the map and header areas
+hideSidebar = () => {
+  if (this.state.sidebarVis === 'open') {
+    const width = window.innerWidth
+
+    if (width < 1135) {
+      document.getElementsByClassName('hamburger-container')[0].style.left = '20px'
+    }
+
+    if (width < 1005) {
+      document.getElementsByClassName('header')[0].style.left = '3%'
+    }
+
+    if (width < 650) {
+      document.getElementsByClassName('location-search')[0].classList.remove('hide')
+      this.setState({sidebarVis: 'closed'})
+    }
+
+    document.getElementsByClassName("sidebar")[0].style.transition = 'all 2s'
+    document.getElementsByClassName("sidebar")[0].classList.add('hide')
+    document.getElementsByClassName('header')[0].style.width = '100%'
+    document.getElementsByClassName('map-area')[0].style.width = '100%'
+    document.getElementById('map').style.width = '100%'
+    this.resizeMap()
+    this.toggleSidebar()
+  }
+}
+
+//set Light Theme
+lightTheme = () => {
+  this.state.map.setOptions({styles: lightTheme})
+}
+
+//set Dark Theme
+darkTheme = () => {
+  this.state.map.setOptions({styles: darkTheme})
+}
 
   //TODO:Enable service worker + offline first
-
-  //TODO:Enable Focus (tabbing)
-  //TODO:Site elements are defined semantically (ARIA)
-  //TODO:Responsive design and styling overhaul
+  //TODO:Responsive design
 
   render() {
     return (
       <div>
-        <div className='sidebar'>
+        <div className='sidebar' id='mySidebar'>
+          <div className='close-button-container' onClick={this.hideSidebar}>
+            <i className="fas fa-window-close mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></i>
+          </div>
           <div className='filter'>
             <input
               id='places-button'
@@ -393,10 +496,10 @@ createWindow = (name, info) => {
               value='List'
               className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
               onClick={(e) => this.viewList(e)}/>
-        </div>
+          </div>
           <div>
             {this.state.view === 'places' ?
-            (<Places
+            (<Interests
               interests={this.state.interests}
               getPlaces={this.getPlaces}
               updateInterest={this.updateInterest}
@@ -411,6 +514,20 @@ createWindow = (name, info) => {
               interests={this.state.interests}
             />)
             }
+          </div>
+          <div className='theme-options'>
+            <div className='theme-button-container'>
+              <button
+                className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                onClick={this.darkTheme}>
+                Dark
+              </button>
+              <button
+                className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                onClick={this.lightTheme}>
+                Light
+              </button>
+             </div>
           </div>
           <div className='powered-by-container'>
             <p>Powered By:</p>
@@ -427,7 +544,10 @@ createWindow = (name, info) => {
           getPlaces={this.getPlaces}
           findCenter={this.findCenter}
           map={this.state.map}
-          setMap={this.setMap}/>
+          setMap={this.setMap}
+          resizeMap={this.resizeMap}
+          sidebar={this.state.sidebarVis}
+          toggle={this.toggleSidebar}/>
       </div>
     )
   }

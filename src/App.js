@@ -418,16 +418,16 @@ createMarker = (lat, lng, name, id, interest, infowindow) => {
 
 //create a google infowindow, populated by info from Foursquare API
 createWindow = (name, info) => {
-  let photoHTML = (info.photoURL !== 'Kein Foto') ? `<img src=${info.photoURL} alt=${name+' image'}></img>` : '<h6>No Photos Available</h6>'
-  let hoursHTML = (info.hours !== 'Hours Not Available') ? `<p class='hours-text'>Open Today: ${info.hours.start} to ${info.hours.end}</p>` : `<p class='hours-text'>Hours Not Available</p>`
-  let linkHTML = (info.link) ? `<a href=${info.link}><h6 class='name'>${name}</h6></a>` : `<h6 class='name'>${name}</h6>`
+  let photoHTML = (info.photoURL !== 'Kein Foto') ? `<img src=${info.photoURL} alt=${name+' image'} tabindex=2></img>` : '<h6 tabindex=2>No Photos Available</h6>'
+  let hoursHTML = (info.hours !== 'Hours Not Available') ? `<p class='hours-text' tabIndex=3>Open Today: ${info.hours.start} to ${info.hours.end}</p>` : `<p class='hours-text' tabindex=3>Hours Not Available</p>`
+  let linkHTML = (info.link) ? `<a href=${info.link}><h6 class='name' tabindex=4>${name}</h6></a>` : `<h6 class='name' tabindex=4>${name}</h6>`
   const infowindow = new google.maps.InfoWindow({
-    content: `<div class='infowindow-div'>
+    content: `<div class='infowindow-div' tabindex=1>
         ${linkHTML}
-        <div class='picture-container'>
+        <div class='picture-container' tabindex=2>
           ${photoHTML}
         </div>
-        <div class='hours'>
+        <div class='hours' tabindex=3>
           ${hoursHTML}
         </div>
       </div>`

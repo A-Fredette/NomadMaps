@@ -9,6 +9,8 @@ If you would like to download the app:
 
 This should automatically launch a development server. If it does not, the app can be accessed at http://localhost:3000/ from your web browser.
 
+Please note that Service Worker will only work in a production build of this project. To launch a production build, run npm build. A production build is also available at this URL: https://a-fredette.github.io/NomadMaps/
+
 ## Summary
 The purpose of this app is to help nomads quickly become familiar with an area by quickly identifying all of the places that the user might be interested in. Read the guidelines below for instructions on how to use the app.
 

@@ -310,7 +310,7 @@ class App extends Component {
   getId = (lat, lng, name, info) => {
     return new Promise((resolve, reject) => {
       info.name = name
-      fetch(`https://api.foursquare.com/v2/venues/search?ll=${lat},${lng}&llAcc=1000&intent=match&name=${name}&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+      fetch(`https://api.foursquare.com/v2/venues/search?ll=${lat},${lng}&llAcc=1000&intent=match&name=${name}&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=W1DK4YI5JF0Z2TLFPX2QBR21M2ULEKKKTTUT2IC0IPAZBXW5&v=20180115`,
       { method: 'GET'})
       .then(response => this.handleErrors(response, name))
       .then(response => {
@@ -334,7 +334,7 @@ class App extends Component {
         info.photoURL = 'Kein Foto'
         resolve(info)
       } else {
-        fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/photos?&limit=1&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+        fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/photos?&limit=1&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=W1DK4YI5JF0Z2TLFPX2QBR21M2ULEKKKTTUT2IC0IPAZBXW5&v=20180115`,
         { method: 'GET' })
       .then(response => {
         return response.json()
@@ -355,7 +355,7 @@ getHours = (info) => {
       info.hours = 'Hours Not Available'
       resolve(info)
     } else {
-      fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/hours?&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=FAVRM415CZFX4C21VR4QENHLXMGH0BUMEDZSKQVSOVY5GBEH&v=20180115`,
+      fetch(`https://api.foursquare.com/v2/venues/${info.foursquareId}/hours?&client_id=NNJGDXP3DFPSLBOIHH4SVZBTYQKQ5IF1L5IZPFBYOXO4EL0R&client_secret=W1DK4YI5JF0Z2TLFPX2QBR21M2ULEKKKTTUT2IC0IPAZBXW5&v=20180115`,
         { method: 'GET' })
       .then(response => response.json())
       .then(data => {
